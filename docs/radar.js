@@ -274,6 +274,62 @@ function radar_visualization(config) {
 
   var grid = radar.append("g");
 
+  // --- segment zoom (Thoughtworks-style: click a segment to zoom into it) -----------
+  // The radar group is translated to the canvas centre, so the zoom viewBox is computed
+  // in SVG coordinates (the segment's bounding box shifted by the centre offset).
+  var currentZoom = null;
+  var fullViewBox = "0 0 " + scaled_width + " " + scaled_height;
+
+  function segmentViewBox(q) {
+    var Rg = rings[rings.length - 1].radius;
+    var pad = 34;
+    var amin = segment_angle * q, amax = segment_angle * (q + 1);
+    var xs = [0, Rg * Math.cos(amin), Rg * Math.cos(amax)];
+    var ys = [0, Rg * Math.sin(amin), Rg * Math.sin(amax)];
+    var cardinals = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI];
+    for (var c = 0; c < cardinals.length; c++) {
+      if (cardinals[c] >= amin && cardinals[c] <= amax) {
+        xs.push(Rg * Math.cos(cardinals[c]));
+        ys.push(Rg * Math.sin(cardinals[c]));
+      }
+    }
+    var minX = Math.min.apply(null, xs) - pad, minY = Math.min.apply(null, ys) - pad;
+    var w = Math.max.apply(null, xs) - Math.min.apply(null, xs) + 2 * pad;
+    var h = Math.max.apply(null, ys) - Math.min.apply(null, ys) + 2 * pad;
+    return (minX + scaled_width / 2) + " " + (minY + scaled_height / 2) + " " + w + " " + h;
+  }
+
+  function hoverSegment(q, on) {
+    grid.selectAll(".seg-fill").style("opacity", function() {
+      return (!on || +this.getAttribute("data-seg") === q) ? 1 : 0.5;
+    });
+  }
+
+  function zoomToSegment(q) {
+    currentZoom = q;
+    svg.transition().duration(650).attr("viewBox", segmentViewBox(q));
+    grid.selectAll(".seg-fill").transition().duration(400)
+      .style("opacity", function() { return +this.getAttribute("data-seg") === q ? 1 : 0.12; });
+    grid.selectAll(".seg-rim").transition().duration(250)
+      .style("opacity", function() { return +this.getAttribute("data-seg") === q ? 1 : 0; });
+    rink.selectAll("g.blip").transition().duration(400)
+      .style("opacity", function(d) { return d.quadrant === q ? 1 : 0.05; });
+    if (config.onSegmentSelect) config.onSegmentSelect(q);
+  }
+
+  function zoomReset() {
+    currentZoom = null;
+    svg.transition().duration(650).attr("viewBox", fullViewBox);
+    grid.selectAll(".seg-fill").transition().duration(400).style("opacity", 1);
+    grid.selectAll(".seg-rim").transition().duration(250).style("opacity", 1);
+    rink.selectAll("g.blip").transition().duration(400).style("opacity", 1);
+    if (config.onSegmentSelect) config.onSegmentSelect(null);
+  }
+
+  if (typeof window !== "undefined") {
+    window.radarZoom = { to: zoomToSegment, reset: zoomReset, current: function() { return currentZoom; } };
+  }
+
   // define default font-family
   config.font_family = config.font_family || "Arial, Helvetica";
 
@@ -291,12 +347,21 @@ function radar_visualization(config) {
       " A " + ri + " " + ri + " 0 " + large + " 0 " + (ri * Math.cos(t0)) + " " + (ri * Math.sin(t0)) + " Z";
   }
   for (var sf = 0; sf < num_segments; sf++) {
-    var segFill = config.quadrants[sf] && config.quadrants[sf].color;
-    if (segFill) {
-      grid.append("path")
-        .attr("d", sectorPath(segment_angle * sf, segment_angle * (sf + 1), 30, grid_outer_radius))
-        .style("fill", segFill)
-        .style("stroke", "none");
+    if (config.quadrants[sf] && config.quadrants[sf].color) {
+      (function(qi) {
+        var path = grid.append("path")
+          .attr("class", "seg-fill")
+          .attr("data-seg", qi)
+          .attr("d", sectorPath(segment_angle * qi, segment_angle * (qi + 1), 30, grid_outer_radius))
+          .style("fill", config.quadrants[qi].color)
+          .style("stroke", "none");
+        if (config.segment_zoom) {
+          path.style("cursor", "pointer")
+            .on("click", function() { zoomToSegment(qi); })
+            .on("mouseover", function() { if (currentZoom === null) hoverSegment(qi, true); })
+            .on("mouseout", function() { if (currentZoom === null) hoverSegment(qi, false); });
+        }
+      })(sf);
     }
   }
 
@@ -340,7 +405,9 @@ function radar_visualization(config) {
       var lr = grid_outer_radius + 18;
       var anchor = Math.cos(midA) > 0.3 ? "start" : (Math.cos(midA) < -0.3 ? "end" : "middle");
       var dyA = Math.sin(midA) > 0.3 ? 15 : (Math.sin(midA) < -0.3 ? -7 : 4);
-      grid.append("text")
+      var rimLabel = grid.append("text")
+        .attr("class", "seg-rim")
+        .attr("data-seg", sl)
         .text(segObj.name || "")
         .attr("x", lr * Math.cos(midA))
         .attr("y", lr * Math.sin(midA) + dyA)
@@ -351,7 +418,14 @@ function radar_visualization(config) {
         .style("paint-order", "stroke")
         .style("stroke", "#ffffff").style("stroke-width", "4px")
         .style("stroke-linejoin", "round")
-        .style("pointer-events", "none").style("user-select", "none");
+        .style("user-select", "none");
+      if (config.segment_zoom) {
+        (function(qi) {
+          rimLabel.style("cursor", "pointer").on("click", function() { zoomToSegment(qi); });
+        })(sl);
+      } else {
+        rimLabel.style("pointer-events", "none");
+      }
     }
   }
 
@@ -627,7 +701,12 @@ function radar_visualization(config) {
         .style("cursor", "pointer")
         .on("mouseover", function(event, d) { showBubble(d); highlightLegendItem(d); })
         .on("mouseout", function(event, d) { hideBubble(d); unhighlightLegendItem(d); })
-        .on("click", function(event, d) { event.preventDefault(); showInfo(d); });
+        .on("click", function(event, d) {
+          event.preventDefault();
+          // overview: a blip click zooms into its segment; zoomed in: it shows details
+          if (config.segment_zoom && currentZoom === null) { zoomToSegment(d.quadrant); }
+          else { showInfo(d); }
+        });
 
   // configure each blip
   blips.each(function(d) {

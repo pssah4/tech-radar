@@ -36,22 +36,25 @@
   </div>
 </header>
 
-<svg id="radar"></svg>
+<div class="radar-stage">
+  <div class="radar-wrap">
+    <button id="zoom-back" type="button" hidden>&larr; Alle Segmente</button>
+    <svg id="radar"></svg>
+  </div>
+  <aside id="segment-detail" aria-label="Segment-Details" hidden>
+    <div class="sd-head"><span class="sd-name"></span></div>
+    <div class="sd-body"></div>
+  </aside>
+</div>
+<p id="overview-hint">Ein Segment anklicken, um hineinzuzoomen und die Eintraege zu lesen.</p>
 
-<!-- Info-Box: erscheint beim Klick auf einen Blip oder einen Legenden-Eintrag -->
+<!-- Info-Box: erscheint beim Klick auf einen Blip im Zoom -->
 <div id="blip-info" class="blip-info" role="dialog" aria-label="Blip-Details">
   <button class="bi-close" type="button" aria-label="Schließen">&times;</button>
   <div class="bi-title"></div>
   <div class="bi-meta"></div>
   <p class="bi-desc"></p>
 </div>
-
-<!-- Einträge nach Segment, klar gruppiert (Nummer am Blip = Nummer hier) -->
-<section class="panel">
-  <h3>Einträge nach Segment</h3>
-  <p class="hint-line">Eintrag anklicken für Details, mit der Maus überfahren hebt den passenden Punkt im Radar hervor.</p>
-  <div id="segment-legend" class="segment-legend"></div>
-</section>
 
 <!-- Ring-Legende und Bewegungs-Indikatoren -->
 <section class="panel">
@@ -100,8 +103,6 @@
 </section>
 
 <script>
-// Einzige Quelle der Wahrheit für Segmente und Ringe: speist Radar, Tooltips und Legende.
-// fill = helle Flächenfarbe im Radar, accent = kräftige Farbe für Label und Kartenkopf.
 const SEGMENTS = [
   { name: "AI Capabilities",          fill: "#e7ecfd", accent: "#4263eb", description: "Grundlegende KI-Fähigkeiten und Modellkompetenzen, die Anwendungen technisch möglich machen." },
   { name: "Data & AI Tools",          fill: "#fff0e3", accent: "#e8590c", description: "Konkrete Werkzeuge und Produkte, mit denen Mitarbeitende KI im Alltag nutzen." },
@@ -111,7 +112,6 @@ const SEGMENTS = [
   { name: "Methods",                  fill: "#f0ebe6", accent: "#846358", description: "Vorgehensweisen, Praktiken und Muster für die Arbeit mit KI." },
 ];
 
-// color = kräftige Blip-/Ringfarbe, labelColor = auf Weiß gut lesbare Variante fürs Label.
 const RINGS = [
   { name: "SCALE", color: "#5ba300", labelColor: "#4d8b00", description: "Aktiv empfohlen, bewährt und produktiv einsetzbar im EnBW-Kontext." },
   { name: "PILOT", color: "#009eb0", labelColor: "#0093a4", description: "Pilotieren, konkrete Erprobung läuft oder ist empfohlen." },
@@ -119,7 +119,6 @@ const RINGS = [
   { name: "STOP",  color: "#e09b96", labelColor: "#cb5648", description: "Bewusster Stop, nicht weiter investieren." },
 ];
 
-// schwarz oder weiss als Textfarbe, je nach Helligkeit der Hintergrundfarbe
 function contrastText(color) {
   var c = String(color || "").replace("#", "");
   if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
@@ -131,32 +130,96 @@ function contrastText(color) {
 fetch('./config.json').then(function(response) {
   return response.json();
 }).then(function(data) {
+  var entries = data.entries;
   radar_visualization({
     repo_url: "https://github.com/pssah4/tech-radar",
     title: "EnBW AI & Emerging Technology Radar",
     date: data.date,
     width: 1200,
     height: 1000,
-    // Segmente und Ringe mit Farben; Titel/Footer/Rund-um-Legende sind aus, die Texte
-    // liegen als strukturiertes HTML um den Radar herum.
     quadrants: SEGMENTS.map(function(s) { return { name: s.name, color: s.fill, accent: s.accent }; }),
     rings: RINGS.map(function(r) { return { name: r.name, color: r.color, labelColor: r.labelColor }; }),
     print_layout: true,
     draw_title: false,
     draw_footer: false,
     draw_legend: false,
+    segment_zoom: true,
+    onSegmentSelect: function(q) { handleSegmentSelect(q, entries); },
     links_in_new_tabs: true,
-    entries: data.entries,
+    entries: entries,
   });
 
   buildHelp();
   buildRingLegend();
-  buildSegmentLegend(data.entries);
+
+  document.getElementById('zoom-back').addEventListener('click', function() {
+    if (window.radarZoom) window.radarZoom.reset();
+  });
+  // Escape also leaves the zoomed view
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape' && window.radarZoom && window.radarZoom.current() !== null) {
+      if (getComputedStyle(document.getElementById('blip-info')).display === 'none') window.radarZoom.reset();
+    }
+  });
 }).catch(function(err) {
   console.log('Error loading config.json', err);
 });
 
-// Tooltip-Inhalte aus SEGMENTS / RINGS aufbauen
+function handleSegmentSelect(q, entries) {
+  var aside = document.getElementById('segment-detail');
+  var back = document.getElementById('zoom-back');
+  var hint = document.getElementById('overview-hint');
+  var stage = document.querySelector('.radar-stage');
+  if (q === null || q === undefined) {
+    aside.hidden = true;
+    back.hidden = true;
+    hint.hidden = false;
+    stage.classList.remove('zoomed');
+    return;
+  }
+  buildSegmentDetail(q, entries);
+  aside.hidden = false;
+  back.hidden = false;
+  hint.hidden = true;
+  stage.classList.add('zoomed');
+  aside.scrollTop = 0;
+}
+
+function buildSegmentDetail(q, entries) {
+  var seg = SEGMENTS[q];
+  var nameEl = document.querySelector('#segment-detail .sd-name');
+  nameEl.textContent = seg.name;
+  nameEl.style.color = seg.accent;
+  var body = document.querySelector('#segment-detail .sd-body');
+  body.innerHTML = RINGS.map(function(ring, ri) {
+    var items = entries
+      .filter(function(e) { return e.quadrant === q && e.ring === ri; })
+      .sort(function(a, b) { return (+a.id) - (+b.id); });
+    if (!items.length) return '';
+    var lis = items.map(function(e) {
+      return '<li class="sd-item" id="legendItem' + e.id + '" data-id="' + e.id + '" tabindex="0">' +
+        '<span class="sd-num" style="background:' + ring.color + ';color:' + contrastText(ring.color) + '">' + e.id + '</span>' +
+        '<span class="sd-text"><span class="sd-label">' + escapeHtml(e.label) + '</span>' +
+        '<span class="sd-desc">' + escapeHtml(e.description || '') + '</span></span></li>';
+    }).join('');
+    return '<div class="sd-ring"><span class="sd-ring-name" style="color:' + ring.labelColor + '">' +
+      escapeHtml(ring.name) + '</span><ul>' + lis + '</ul></div>';
+  }).join('');
+
+  body.querySelectorAll('.sd-item').forEach(function(li) {
+    var id = li.getAttribute('data-id');
+    var entry = entries.find(function(e) { return '' + e.id === id; });
+    function on()  { li.classList.add('legend-hl');    var b = document.getElementById('blip' + id); if (b) b.classList.add('hl'); }
+    function off() { li.classList.remove('legend-hl'); var b = document.getElementById('blip' + id); if (b) b.classList.remove('hl'); }
+    li.addEventListener('mouseenter', on);
+    li.addEventListener('mouseleave', off);
+    li.addEventListener('focus', on);
+    li.addEventListener('blur', off);
+    li.addEventListener('click', function() { if (window.radarShowInfo && entry) window.radarShowInfo(entry); });
+    li.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (window.radarShowInfo && entry) window.radarShowInfo(entry); } });
+  });
+}
+
 function buildHelp() {
   document.getElementById('help-pop-segments').innerHTML =
     '<strong>Die sechs Segmente</strong>' + SEGMENTS.map(function(s) {
@@ -176,56 +239,12 @@ function buildRingLegend() {
   }).join('');
 }
 
-// Karten-Raster: eine Karte pro Segment, Einträge nach Ring gruppiert, aufsteigend nach Nummer.
-function buildSegmentLegend(entries) {
-  var byId = {};
-  entries.forEach(function(e) { byId[e.id] = e; });
-
-  var html = SEGMENTS.map(function(seg, qi) {
-    var ringsHtml = RINGS.map(function(ring, ri) {
-      var items = entries
-        .filter(function(e) { return e.quadrant === qi && e.ring === ri; })
-        .sort(function(a, b) { return (+a.id) - (+b.id); });
-      if (!items.length) return '';
-      var lis = items.map(function(e) {
-        return '<li class="seg-item" id="legendItem' + e.id + '" data-id="' + e.id + '" tabindex="0">' +
-               '<span class="seg-num" style="background:' + ring.color + ';color:' + contrastText(ring.color) + '">' + e.id + '</span>' +
-               '<span class="seg-label">' + escapeHtml(e.label) + '</span></li>';
-      }).join('');
-      return '<div class="seg-ring">' +
-             '<span class="seg-ring-name" style="color:' + ring.labelColor + '">' + escapeHtml(ring.name) + '</span>' +
-             '<ul>' + lis + '</ul></div>';
-    }).join('');
-    return '<div class="seg-card" style="border-top-color:' + seg.accent + '">' +
-           '<div class="seg-card-head" style="color:' + seg.accent + '">' + escapeHtml(seg.name) + '</div>' +
-           '<div class="seg-card-body">' + ringsHtml + '</div></div>';
-  }).join('');
-
-  var container = document.getElementById('segment-legend');
-  container.innerHTML = html;
-
-  // Hover hebt den passenden Blip im Radar hervor; Klick öffnet die Info-Box.
-  container.querySelectorAll('.seg-item').forEach(function(li) {
-    var id = li.getAttribute('data-id');
-    var entry = byId[id];
-    function on()  { li.classList.add('legend-hl');    var b = document.getElementById('blip' + id); if (b) b.classList.add('hl'); }
-    function off() { li.classList.remove('legend-hl'); var b = document.getElementById('blip' + id); if (b) b.classList.remove('hl'); }
-    li.addEventListener('mouseenter', on);
-    li.addEventListener('mouseleave', off);
-    li.addEventListener('focus', on);
-    li.addEventListener('blur', off);
-    li.addEventListener('click', function() { if (window.radarShowInfo && entry) window.radarShowInfo(entry); });
-    li.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (window.radarShowInfo && entry) window.radarShowInfo(entry); } });
-  });
-}
-
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, function(c) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
   });
 }
 
-// Info-Box schließen, mit Fokus-Rückgabe an das öffnende Element
 function closeBlipInfo() {
   var panel = document.getElementById('blip-info');
   if (getComputedStyle(panel).display === 'none') return;
