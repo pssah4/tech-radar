@@ -125,7 +125,7 @@ const SEGMENT_INFO = [
   // 0 AI Capabilities
   `<p><strong>Leitfrage:</strong> Was kann AI grundsätzlich leisten und welche Fähigkeitsklassen sind für EnBW relevant?</p>
    <p><strong>Was gehört rein:</strong> Abstrakte Fähigkeitsklassen, unabhängig von konkreter Implementierung. Ein Blip hier beschreibt eine Fähigkeit, die man wählt oder beobachtet, nicht ein System, das man konfiguriert.</p>
-   <p><strong>Abgrenzungsregel:</strong> Sobald ein Blip eine konkrete Implementierung (Modell, API, Plattform) beschreibt, gehört er in Kategorie 3 (Infrastructure). Die Fähigkeit &bdquo;Reasoning &amp; Planning&ldquo; ist Kategorie 1. Das Modell &bdquo;o3&ldquo;, das diese Fähigkeit bereitstellt, ist Kategorie 3.</p>
+   <p><strong>Abgrenzungsregel:</strong> Sobald ein Blip eine konkrete Implementierung (Modell, API, Plattform) beschreibt, gehört er in Data &amp; AI Infrastructure. Die Fähigkeit &bdquo;Reasoning &amp; Planning&ldquo; gehört in AI Capabilities. Das Modell &bdquo;o3&ldquo;, das diese Fähigkeit bereitstellt, gehört in Data &amp; AI Infrastructure.</p>
    <p><strong>Fähigkeitsklassen:</strong></p>
    <ul>
      <li>Sprachliche Fähigkeiten: Text Understanding &amp; Generation, Reasoning &amp; Planning, Code Generation, Multilingual</li>
@@ -137,35 +137,35 @@ const SEGMENT_INFO = [
   // 1 Data & AI Tools
   `<p><strong>Leitfrage:</strong> Welche fertigen Werkzeuge nutzen wir, ohne sie selbst zu betreiben?</p>
    <p><strong>Was gehört rein:</strong> SaaS-Produkte, fertige Oberflächen, Low-Code-Builder: alles, was man nutzt, ohne es selbst zu deployen, zu konfigurieren oder darauf zu bauen.</p>
-   <p><strong>Abgrenzungsregel:</strong> Wenn ich es selbst betreibe, konfiguriere oder als Baustein in eigene Systeme einbinde, dann Kategorie 3. Wenn ich es als fertige Oberfläche oder SaaS-Dienst nutze, dann Kategorie 2.</p>
+   <p><strong>Abgrenzungsregel:</strong> Wenn ich es selbst betreibe, konfiguriere oder als Baustein in eigene Systeme einbinde, dann Data &amp; AI Infrastructure. Wenn ich es als fertige Oberfläche oder SaaS-Dienst nutze, dann Data &amp; AI Tools.</p>
    <p><strong>Grenzfälle:</strong></p>
    <ul>
-     <li>Copilot Studio: <b>Kategorie 2</b> (Low-Code-Builder als Tool, ich betreibe es nicht)</li>
-     <li>n8n: <b>Kategorie 3</b> (selbst betriebene Instanz, ich konfiguriere Workflows)</li>
-     <li>Databricks Genie: <b>Kategorie 2</b> (Analyst nutzt es direkt als Oberfläche)</li>
-     <li>Databricks MLflow: <b>Kategorie 3</b> (betriebene Plattform, ich konfiguriere Experimente)</li>
+     <li>Copilot Studio: <b>Data &amp; AI Tools</b> (Low-Code-Builder als Tool, ich betreibe es nicht)</li>
+     <li>n8n: <b>Data &amp; AI Infrastructure</b> (selbst betriebene Instanz, ich konfiguriere Workflows)</li>
+     <li>Databricks Genie: <b>Data &amp; AI Tools</b> (Analyst nutzt es direkt als Oberfläche)</li>
+     <li>Databricks MLflow: <b>Data &amp; AI Infrastructure</b> (betriebene Plattform, ich konfiguriere Experimente)</li>
    </ul>`,
   // 2 Data & AI Infrastructure
   `<p><strong>Leitfrage:</strong> Was betreiben, konfigurieren oder bauen wir als technische Basis?</p>
    <p><strong>Was gehört rein:</strong> Plattformen, APIs, Gateways, Observability-Stacks, Dateninfrastruktur, Laufzeitumgebungen, Modelle als konkrete Implementierungsentscheidung, RAG als betriebener Baustein, FinOps-Infrastruktur.</p>
-   <p><strong>Abgrenzungsregel:</strong> Wenn es eine fertige Oberfläche ist, die ich nur nutze, dann Kategorie 2. Wenn es eine Fähigkeitsklasse ist, die ich beobachte, dann Kategorie 1. Alles, was deployed, betrieben und skaliert werden muss, gehört hier rein.</p>
-   <p><strong>Warum RAG hier ist:</strong> RAG ist kein abstraktes Konzept mehr, es ist ein Baustein, den man konfiguriert, betreibt und in Pipelines einbindet. Als Architekturmuster (wie man RAG denkt) gehört es in Kategorie 6 (Methods).</p>
+   <p><strong>Abgrenzungsregel:</strong> Wenn es eine fertige Oberfläche ist, die ich nur nutze, dann Data &amp; AI Tools. Wenn es eine Fähigkeitsklasse ist, die ich beobachte, dann AI Capabilities. Alles, was deployed, betrieben und skaliert werden muss, gehört hier rein.</p>
+   <p><strong>Warum RAG hier ist:</strong> RAG ist kein abstraktes Konzept mehr, es ist ein Baustein, den man konfiguriert, betreibt und in Pipelines einbindet. Als Architekturmuster (wie man RAG denkt) gehört es in Methods.</p>
    <p><strong>Warum FinOps hier ist:</strong> FinOps-Infrastruktur (Token-Tracking, Kostenallokation, Chargeback) ist eine betriebene Capability, keine Governance-Richtlinie.</p>`,
   // 3 Security & Governance
   `<p><strong>Leitfrage:</strong> Unter welchen Bedingungen dürfen und können wir AI einsetzen?</p>
    <p><strong>Was gehört rein:</strong> Sicherheitstechnologien, Identitätsmanagement für Agenten, Compliance-Frameworks, interne und externe Richtlinien, regulatorische Anforderungen. Alles, was den Einsatz von AI einschränkt, absichert oder nachweisbar macht.</p>
-   <p><strong>Abgrenzungsregel:</strong> Wenn eine Technologie primär wegen Compliance- oder Sicherheitsanforderungen relevant ist, dann Kategorie 4. Wenn sie zufällig auch Compliance-Implikationen hat, aber primär eine andere Funktion erfüllt, dann primäre Kategorie nach Funktion.</p>
+   <p><strong>Abgrenzungsregel:</strong> Wenn eine Technologie primär wegen Compliance- oder Sicherheitsanforderungen relevant ist, dann Security &amp; Governance. Wenn sie zufällig auch Compliance-Implikationen hat, aber primär eine andere Funktion erfüllt, dann primäre Kategorie nach Funktion.</p>
    <p><strong>EnBW-spezifische Relevanz:</strong> EU AI Act Risk Classification, DSGVO-Patterns für Energiedaten, OT/IT-Sicherheit für AI-Systeme, Agent Identity (Agenten brauchen eigene Identitäten im IAM), Post-Quantum Cryptography als Sicherheitsrelevanz.</p>`,
   // 4 Anwendungsfelder
   `<p><strong>Leitfrage:</strong> Was wird durch AI möglich, welche Anwendungsklassen entstehen, und welche sind für EnBW relevant?</p>
    <p><strong>Was gehört rein:</strong> Anwendungsklassen und Use Case Patterns: generische Beschreibungen dessen, was mit einer Kombination aus Technologien möglich wird. Auch verwandte Themenfelder, die durch AI-Entwicklungen relevant werden (Drohnen, Humanoide Roboter, Physical AI).</p>
    <p><strong>Abgrenzungsregel:</strong> Ein Blip hier ist immer eine Klasse von Anwendungen, nie ein konkretes EnBW-Projekt. &bdquo;Agentic Document Processing&ldquo; ist ein Blip. &bdquo;Netzplanung-Agent für EnBW&ldquo; ist kein Blip, das gehört in die Innovations-Pipeline.</p>
-   <p><strong>Warum diese Kategorie der wichtigste Steuerungshebel ist:</strong> Kategorie 5 ist der direkte Funnel für die Agentic Factory. Wenn eine Anwendungsklasse von &bdquo;Watch&ldquo; auf &bdquo;Pilot&ldquo; geht, ist das das Signal, dass die AF sich damit befassen soll. Wer diese Kategorie pflegt, steuert die Prioritäten, ohne formale Entscheidungshoheit.</p>`,
+   <p><strong>Warum diese Kategorie der wichtigste Steuerungshebel ist:</strong> Anwendungsfelder ist der direkte Funnel für die Agentic Factory. Wenn eine Anwendungsklasse von &bdquo;Watch&ldquo; auf &bdquo;Pilot&ldquo; geht, ist das das Signal, dass die AF sich damit befassen soll. Wer diese Kategorie pflegt, steuert die Prioritäten, ohne formale Entscheidungshoheit.</p>`,
   // 5 Methods
   `<p><strong>Leitfrage:</strong> Wie arbeiten wir mit AI, welche Methoden, Patterns und Arbeitsweisen bringen uns voran?</p>
    <p><strong>Was gehört rein:</strong> Entwicklungsmethoden, Architekturmuster (als Konzept, nicht als betriebener Baustein), Workflows, Skills, Arbeitsweisen, sowohl für Developer als auch für Knowledge Worker.</p>
-   <p><strong>Abgrenzungsregel:</strong> Wenn es ein betriebener Baustein ist, dann Kategorie 3. Wenn es eine fertige Oberfläche ist, dann Kategorie 2. Wenn es beschreibt, wie man arbeitet oder denkt, dann Kategorie 6.</p>
-   <p><strong>Grenzfall RAG:</strong> RAG als betriebener Stack, dann Kategorie 3. RAG als Architekturmuster (wie man Retrieval und Generation kombiniert, welche Chunking-Strategien es gibt), dann Kategorie 6.</p>`,
+   <p><strong>Abgrenzungsregel:</strong> Wenn es ein betriebener Baustein ist, dann Data &amp; AI Infrastructure. Wenn es eine fertige Oberfläche ist, dann Data &amp; AI Tools. Wenn es beschreibt, wie man arbeitet oder denkt, dann Methods.</p>
+   <p><strong>Grenzfall RAG:</strong> RAG als betriebener Stack, dann Data &amp; AI Infrastructure. RAG als Architekturmuster (wie man Retrieval und Generation kombiniert, welche Chunking-Strategien es gibt), dann Methods.</p>`,
 ];
 
 fetch('./config.json').then(function(response) {
