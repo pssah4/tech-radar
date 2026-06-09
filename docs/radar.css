@@ -27,6 +27,61 @@ body {
   color: #888;
   font-size: 14px;
 }
+.subhead-hint {
+  color: #888;
+  font-size: 13px;
+}
+
+/* Popover mit der Kategorie-Definition (vom "?" am Segment) */
+#seg-desc-pop {
+  position: absolute;
+  z-index: 200;
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  max-height: 75vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-top: 4px solid #666;
+  border-radius: 10px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.2);
+  padding: 16px 20px 20px;
+}
+#seg-desc-pop[hidden] {
+  display: none;
+}
+.sdp-close {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+}
+.sdp-close:hover {
+  color: #333;
+}
+.sdp-body h4 {
+  margin: 0 24px 10px 0;
+  font-size: 18px;
+}
+.sdp-body p {
+  margin: 8px 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+}
+.sdp-body ul {
+  margin: 6px 0 10px;
+  padding-left: 20px;
+}
+.sdp-body li {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 4px 0;
+}
 
 /* Buehne: Radar links, Detail-Panel rechts (erscheint im Zoom) */
 .radar-stage {
@@ -42,11 +97,14 @@ body {
   flex: 1 1 auto;
   min-width: 0;
 }
-/* Radar skaliert responsiv (viewBox in radar.js gesetzt) */
+/* Radar skaliert responsiv (viewBox in radar.js gesetzt) und passt in die
+   Viewport-Hoehe, damit er bei 100% ohne Scrollen vollstaendig sichtbar ist */
 svg#radar {
   display: block;
-  max-width: 100%;
+  width: auto;
   height: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 175px);
   margin: 0 auto;
 }
 #zoom-back {

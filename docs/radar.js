@@ -357,7 +357,7 @@ function radar_visualization(config) {
           .style("stroke", "none");
         if (config.segment_zoom) {
           path.style("cursor", "pointer")
-            .on("click", function() { zoomToSegment(qi); })
+            .on("click", function() { if (currentZoom === qi) zoomReset(); else zoomToSegment(qi); })
             .on("mouseover", function() { if (currentZoom === null) hoverSegment(qi, true); })
             .on("mouseout", function() { if (currentZoom === null) hoverSegment(qi, false); });
         }
@@ -421,10 +421,41 @@ function radar_visualization(config) {
         .style("user-select", "none");
       if (config.segment_zoom) {
         (function(qi) {
-          rimLabel.style("cursor", "pointer").on("click", function() { zoomToSegment(qi); });
+          // click the segment name to zoom in, click it again to zoom back out
+          rimLabel.style("cursor", "pointer").on("click", function() {
+            if (currentZoom === qi) zoomReset(); else zoomToSegment(qi);
+          });
         })(sl);
       } else {
         rimLabel.style("pointer-events", "none");
+      }
+
+      // a small "?" badge next to each segment name opens the category definition
+      if (config.onSegmentInfo) {
+        (function(qi) {
+          var bb = rimLabel.node().getBBox();
+          var bx = anchor === "end" ? bb.x - 11 : bb.x + bb.width + 11;
+          var by = bb.y + bb.height / 2;
+          var infoG = grid.append("g")
+            .attr("class", "seg-rim seg-info")
+            .attr("data-seg", qi)
+            .style("cursor", "help");
+          infoG.append("circle")
+            .attr("cx", bx).attr("cy", by).attr("r", 8.5)
+            .style("fill", "#ffffff")
+            .style("stroke", segObj.accent || "#666").style("stroke-width", 1.3);
+          infoG.append("text")
+            .attr("x", bx).attr("y", by + 4).attr("text-anchor", "middle")
+            .text("?")
+            .style("fill", segObj.accent || "#666")
+            .style("font-family", config.font_family)
+            .style("font-size", "12px").style("font-weight", "bold")
+            .style("pointer-events", "none").style("user-select", "none");
+          infoG.on("click", function(event) {
+            event.stopPropagation();
+            config.onSegmentInfo(qi, { x: event.pageX, y: event.pageY });
+          });
+        })(sl);
       }
     }
   }
