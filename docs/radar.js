@@ -62,13 +62,40 @@ function radar_visualization(config) {
     return min + (random() + random()) * 0.5 * (max - min);
   }
 
-  // radial_min / radial_max are multiples of PI
-  const quadrants = [
-    { radial_min: 0, radial_max: 0.5, factor_x: 1, factor_y: 1 },
-    { radial_min: 0.5, radial_max: 1, factor_x: -1, factor_y: 1 },
-    { radial_min: -1, radial_max: -0.5, factor_x: -1, factor_y: -1 },
-    { radial_min: -0.5, radial_max: 0, factor_x: 1, factor_y: -1 }
-  ];
+  // number of segments is derived from the quadrant config, so the radar supports
+  // any N (the original was hardcoded to 4). With N segments the circle is split
+  // into N equal angular wedges.
+  const num_segments = config.quadrants.length;
+  const segment_angle = 2 * Math.PI / num_segments;
+
+  // radial_min / radial_max are absolute angles in radians (the original stored
+  // multiples of PI for the 4 fixed quadrants). segment() and viewbox() derive
+  // everything else (midpoint, bounding box) from these two angles.
+  const quadrants = [];
+  for (var qi = 0; qi < num_segments; qi++) {
+    quadrants.push({
+      radial_min: segment_angle * qi,
+      radial_max: segment_angle * (qi + 1)
+    });
+  }
+
+  // The original 4-corner legend layout does not fit N segments. Rebuild it as two
+  // vertical columns (left / right of the radar) unless an explicit list with the
+  // matching length was provided.
+  if (!("legend_offset" in config) || config.legend_offset.length !== num_segments) {
+    config.legend_offset = [];
+    var per_side = Math.ceil(num_segments / 2);
+    var legend_top = -540;
+    var legend_step = per_side > 1 ? Math.min(360, 1040 / (per_side - 1)) : 0;
+    for (var li = 0; li < num_segments; li++) {
+      var on_right = li < per_side;
+      var row = on_right ? li : li - per_side;
+      config.legend_offset.push({
+        x: on_right ? 480 : -780,
+        y: legend_top + row * legend_step
+      });
+    }
+  }
 
   const rings = [
     { radius: 130 },
@@ -99,54 +126,44 @@ function radar_visualization(config) {
     return Math.min(Math.max(value, low), high);
   }
 
-  function bounded_ring(polar, r_min, r_max) {
-    return {
-      t: polar.t,
-      r: bounded_interval(polar.r, r_min, r_max)
-    }
-  }
-
-  function bounded_box(point, min, max) {
-    return {
-      x: bounded_interval(point.x, min.x, max.x),
-      y: bounded_interval(point.y, min.y, max.y)
-    }
-  }
-
   function segment(quadrant, ring) {
-    var polar_min = {
-      t: quadrants[quadrant].radial_min * Math.PI,
-      r: ring === 0 ? 30 : rings[ring - 1].radius
-    };
-    var polar_max = {
-      t: quadrants[quadrant].radial_max * Math.PI,
-      r: rings[ring].radius
-    };
-    var cartesian_min = {
-      x: 15 * quadrants[quadrant].factor_x,
-      y: 15 * quadrants[quadrant].factor_y
-    };
-    var cartesian_max = {
-      x: rings[3].radius * quadrants[quadrant].factor_x,
-      y: rings[3].radius * quadrants[quadrant].factor_y
-    };
+    var q = quadrants[quadrant];
+    var t_min = q.radial_min;
+    var t_max = q.radial_max;
+    var t_mid = (t_min + t_max) / 2;
+    var r_min = ring === 0 ? 30 : rings[ring - 1].radius;
+    var r_max = rings[ring].radius;
+    var pad_r = 15;
+    // angular padding keeps blips off the wedge borders; it shrinks for narrow wedges
+    var pad_t = Math.min((t_max - t_min) * 0.10, 0.12);
+
+    // Clamp an absolute angle into this wedge. Unwrap to the branch nearest the wedge
+    // midpoint first, so the atan2 seam at +/-PI never flings a blip to the far edge.
+    function clamp_angle(t) {
+      while (t < t_mid - Math.PI) t += 2 * Math.PI;
+      while (t >= t_mid + Math.PI) t -= 2 * Math.PI;
+      return bounded_interval(t, t_min + pad_t, t_max - pad_t);
+    }
+
+    // Clamp a point into the wedge (angle) and the ring band (radius). Replaces the
+    // original axis-aligned bounding box, which only worked for axis-aligned quadrants.
+    function clamp_point(d) {
+      var p = polar(d);
+      var t = clamp_angle(p.t);
+      var r = bounded_interval(p.r, r_min + pad_r, r_max - pad_r);
+      var c = cartesian({ t: t, r: r });
+      d.x = c.x; // adjust data too!
+      d.y = c.y;
+      return d;
+    }
+
     return {
-      clipx: function(d) {
-        var c = bounded_box(d, cartesian_min, cartesian_max);
-        var p = bounded_ring(polar(c), polar_min.r + 15, polar_max.r - 15);
-        d.x = cartesian(p).x; // adjust data too!
-        return d.x;
-      },
-      clipy: function(d) {
-        var c = bounded_box(d, cartesian_min, cartesian_max);
-        var p = bounded_ring(polar(c), polar_min.r + 15, polar_max.r - 15);
-        d.y = cartesian(p).y; // adjust data too!
-        return d.y;
-      },
+      clipx: function(d) { return clamp_point(d).x; },
+      clipy: function(d) { return clamp_point(d).y; },
       random: function() {
         return cartesian({
-          t: random_between(polar_min.t, polar_max.t),
-          r: normal_between(polar_min.r, polar_max.r)
+          t: random_between(t_min + pad_t, t_max - pad_t),
+          r: normal_between(r_min + pad_r, r_max - pad_r)
         });
       }
     }
@@ -164,10 +181,10 @@ function radar_visualization(config) {
   }
 
   // partition entries according to segments
-  var segmented = new Array(4);
-  for (let quadrant = 0; quadrant < 4; quadrant++) {
-    segmented[quadrant] = new Array(4);
-    for (var ring = 0; ring < 4; ring++) {
+  var segmented = new Array(num_segments);
+  for (let quadrant = 0; quadrant < num_segments; quadrant++) {
+    segmented[quadrant] = new Array(rings.length);
+    for (var ring = 0; ring < rings.length; ring++) {
       segmented[quadrant][ring] = [];
     }
   }
@@ -176,10 +193,10 @@ function radar_visualization(config) {
     segmented[entry.quadrant][entry.ring].push(entry);
   }
 
-  // assign unique sequential id to each entry
+  // assign unique sequential id to each entry, segment by segment, ring by ring
   var id = 1;
-  for (quadrant of [2,3,1,0]) {
-    for (var ring = 0; ring < 4; ring++) {
+  for (var quadrant = 0; quadrant < num_segments; quadrant++) {
+    for (var ring = 0; ring < rings.length; ring++) {
       var entries = segmented[quadrant][ring];
       entries.sort(function(a,b) { return a.label.localeCompare(b.label); })
       for (var i=0; i<entries.length; i++) {
@@ -192,13 +209,32 @@ function radar_visualization(config) {
     return "translate(" + x + "," + y + ")";
   }
 
+  // Frame a single wedge for the optional zoomed view. Computed from the wedge's real
+  // angular extent (centre, both radial edges, the outer arc and any axis extreme the
+  // arc crosses), so it is correct for any number of segments, not just axis-aligned N=4.
   function viewbox(quadrant) {
-    return [
-      Math.max(0, quadrants[quadrant].factor_x * 400) - 420,
-      Math.max(0, quadrants[quadrant].factor_y * 400) - 420,
-      440,
-      440
-    ].join(" ");
+    var q = quadrants[quadrant];
+    var R = rings[rings.length - 1].radius;
+    var pad = 20;
+    var pts = [
+      { x: 0, y: 0 },
+      { x: R * Math.cos(q.radial_min), y: R * Math.sin(q.radial_min) },
+      { x: R * Math.cos(q.radial_max), y: R * Math.sin(q.radial_max) }
+    ];
+    // the outer arc reaches an axis extreme (+-R) wherever it crosses a cardinal angle
+    var cardinals = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI];
+    for (var c = 0; c < cardinals.length; c++) {
+      if (cardinals[c] >= q.radial_min && cardinals[c] <= q.radial_max) {
+        pts.push({ x: R * Math.cos(cardinals[c]), y: R * Math.sin(cardinals[c]) });
+      }
+    }
+    var xs = pts.map(function(p) { return p.x; });
+    var ys = pts.map(function(p) { return p.y; });
+    var minX = Math.min.apply(null, xs);
+    var minY = Math.min.apply(null, ys);
+    var width = Math.max.apply(null, xs) - minX;
+    var height = Math.max.apply(null, ys) - minY;
+    return [minX - pad, minY - pad, width + 2 * pad, height + 2 * pad].join(" ");
   }
 
   // adjust with config.scale.
@@ -215,6 +251,9 @@ function radar_visualization(config) {
   if ("zoomed_quadrant" in config) {
     svg.attr("viewBox", viewbox(config.zoomed_quadrant));
   } else {
+    // a viewBox spanning the full canvas lets the SVG scale responsively via CSS
+    // (max-width: 100%) instead of forcing horizontal scroll on smaller screens
+    svg.attr("viewBox", "0 0 " + scaled_width + " " + scaled_height);
     radar.attr("transform", translate(scaled_width / 2, scaled_height / 2).concat(`scale(${config.scale})`));
   }
 
@@ -223,17 +262,18 @@ function radar_visualization(config) {
   // define default font-family
   config.font_family = config.font_family || "Arial, Helvetica";
 
-  // draw grid lines
-  grid.append("line")
-    .attr("x1", 0).attr("y1", -400)
-    .attr("x2", 0).attr("y2", 400)
-    .style("stroke", config.colors.grid)
-    .style("stroke-width", 1);
-  grid.append("line")
-    .attr("x1", -400).attr("y1", 0)
-    .attr("x2", 400).attr("y2", 0)
-    .style("stroke", config.colors.grid)
-    .style("stroke-width", 1);
+  // draw segment divider lines: one spoke from the centre to the outer ring per
+  // segment boundary. Two crossing lines (the original) are just the N=4 case.
+  var grid_outer_radius = rings[rings.length - 1].radius;
+  for (var s = 0; s < num_segments; s++) {
+    var grid_angle = segment_angle * s;
+    grid.append("line")
+      .attr("x1", 0).attr("y1", 0)
+      .attr("x2", grid_outer_radius * Math.cos(grid_angle))
+      .attr("y2", grid_outer_radius * Math.sin(grid_angle))
+      .style("stroke", config.colors.grid)
+      .style("stroke-width", 1);
+  }
 
   // background color. Usage `.attr("filter", "url(#solid)")`
   // SOURCE: https://stackoverflow.com/a/31013492/2609980
@@ -319,7 +359,7 @@ function radar_visualization(config) {
 
     // legend
     const legend = radar.append("g");
-    for (let quadrant = 0; quadrant < 4; quadrant++) {
+    for (let quadrant = 0; quadrant < num_segments; quadrant++) {
       legend.append("text")
         .attr("transform", translate(
           config.legend_offset[quadrant].x,
@@ -330,7 +370,7 @@ function radar_visualization(config) {
         .style("font-size", "18px")
         .style("font-weight", "bold");
       let previousLegendHeight = 0
-      for (let ring = 0; ring < 4; ring++) {
+      for (let ring = 0; ring < rings.length; ring++) {
         if (ring % 2 === 0) {
           previousLegendHeight = 0
         }
@@ -359,8 +399,10 @@ function radar_visualization(config) {
               .text(function(d) { return d.id + ". " + d.label; })
               .style("font-family", config.font_family)
               .style("font-size", "11px")
+              .style("cursor", "pointer")
               .on("mouseover", function(event, d) { showBubble(d); highlightLegendItem(d); })
               .on("mouseout", function(event, d) { hideBubble(d); unhighlightLegendItem(d); })
+              .on("click", function(event, d) { event.preventDefault(); showInfo(d); })
               .call(wrap_text)
               .each(function() {
                 previousLegendHeight += d3.select(this).node().getBBox().height;
@@ -474,6 +516,27 @@ function radar_visualization(config) {
     legendItem.removeAttribute("fill");
   }
 
+  // Populate the HTML info box (defined in index.html) with the clicked blip.
+  // radar.js stays agnostic: if no #blip-info element exists, the click is a no-op.
+  function showInfo(d) {
+    var panel = document.getElementById("blip-info");
+    if (!panel) return;
+    var segName = config.quadrants[d.quadrant] ? config.quadrants[d.quadrant].name : "";
+    var ringObj = config.rings[d.ring] || {};
+    panel.querySelector(".bi-title").textContent = d.id + ". " + d.label;
+    var meta = panel.querySelector(".bi-meta");
+    meta.textContent = segName + "  ·  " + (ringObj.name || "");
+    meta.style.color = ringObj.color || "#333";
+    panel.querySelector(".bi-desc").textContent = d.description || "Keine Beschreibung hinterlegt.";
+    panel.style.borderLeftColor = ringObj.color || "#333";
+    panel.style.display = "block";
+    // accessibility: remember the opener and move focus into the dialog so it can be
+    // dismissed by keyboard (Escape / the close button), focus is restored on close
+    panel._opener = document.activeElement;
+    var closeBtn = panel.querySelector(".bi-close");
+    if (closeBtn) closeBtn.focus();
+  }
+
   // draw blips on radar
   var blips = rink.selectAll(".blip")
     .data(config.entries)
@@ -481,8 +544,10 @@ function radar_visualization(config) {
       .append("g")
         .attr("class", "blip")
         .attr("transform", function(d, i) { return legend_transform(d.quadrant, d.ring, config.legend_column_width, i); })
+        .style("cursor", "pointer")
         .on("mouseover", function(event, d) { showBubble(d); highlightLegendItem(d); })
-        .on("mouseout", function(event, d) { hideBubble(d); unhighlightLegendItem(d); });
+        .on("mouseout", function(event, d) { hideBubble(d); unhighlightLegendItem(d); })
+        .on("click", function(event, d) { event.preventDefault(); showInfo(d); });
 
   // configure each blip
   blips.each(function(d) {

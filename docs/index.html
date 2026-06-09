@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="de">
 
 <head>
 <meta http-equiv="Content-type" content="text/html; charset=utf-8">
-<meta name="description" content="Zalando Tech Radar: a tool to visualize technology choices, inspire and support Engineering teams at Zalando to pick the best technologies for new projects">
+<meta name="description" content="EnBW AI & Emerging Technology Radar: zentrales Steuerungs- und Kommunikationsinstrument für KI und neue Technologien in der EnBW.">
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zalando Tech Radar</title>
-<link rel="shortcut icon" href="https://www.zalando.de/favicon.ico">
+<title>EnBW AI &amp; Emerging Technology Radar</title>
 
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <script src="radar.js"></script>
@@ -16,76 +15,164 @@
 
 <body>
 
+<!-- Hilfsleiste mit "?"-Tooltips für Segmente und Ringe -->
+<div id="help-bar">
+  <span class="help-group">
+    <span class="help-label">Segmente</span>
+    <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Segmente" aria-describedby="help-pop-segments">?
+      <span class="help-pop" id="help-pop-segments" role="tooltip"></span>
+    </span>
+  </span>
+  <span class="help-group">
+    <span class="help-label">Ringe</span>
+    <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Ringe" aria-describedby="help-pop-rings">?
+      <span class="help-pop" id="help-pop-rings" role="tooltip"></span>
+    </span>
+  </span>
+  <span id="help-hint">Tipp: Einzelnen Blip anklicken für Details</span>
+</div>
+
 <svg id="radar"></svg>
 
+<!-- Info-Box: erscheint beim Klick auf einen Blip -->
+<div id="blip-info" class="blip-info" role="dialog" aria-modal="true" aria-label="Blip-Details">
+  <button class="bi-close" type="button" aria-label="Schließen">&times;</button>
+  <div class="bi-title"></div>
+  <div class="bi-meta"></div>
+  <p class="bi-desc"></p>
+</div>
+
+<!-- Ring-Legende -->
+<div class="panel">
+  <h3>Die vier Ringe</h3>
+  <ul id="ring-legend" class="ring-legend"></ul>
+</div>
+
+<!-- Dokumentierter Intake- und Bewegungs-Prozess -->
+<div class="panel">
+  <h3>Wie Einträge in den Radar kommen und sich bewegen</h3>
+  <p>
+    Der Radar ist ein lebendes Dokument und wird quartalsweise gepflegt. Neue Technologien,
+    Werkzeuge und Methoden durchlaufen einen festen Ablauf, bevor sie als Blip erscheinen oder
+    den Ring wechseln.
+  </p>
+  <ol class="process">
+    <li><strong>Vorschlag (Intake).</strong> Jede und jeder aus C-TD und der EnBW Agentic Factory
+      kann einen Eintrag vorschlagen, mit kurzer Begründung und Bezug zu einem der sechs Segmente.</li>
+    <li><strong>Bewertung.</strong> Der Vorschlag wird entlang fester Kriterien bewertet:
+      Reifegrad, Relevanz für den EnBW-Kontext, Risiko sowie Aufwand und Kosten.</li>
+    <li><strong>Ring-Einordnung.</strong> Auf Basis der Bewertung wird der Eintrag einem Ring
+      zugeordnet, von WATCH über PILOT bis SCALE, oder bewusst auf STOP gesetzt.</li>
+    <li><strong>Quartals-Review.</strong> Einmal pro Quartal werden alle Einträge gesichtet.
+      Bewegungen nach innen (mehr Reife, mehr Einsatz) oder außen (Stop) werden hier entschieden.</li>
+    <li><strong>Bewegung sichtbar machen.</strong> Jede Veränderung wird am Blip markiert, damit
+      Stakeholder die Entwicklung auf einen Blick erkennen.</li>
+  </ol>
+  <p class="movement-legend">
+    <span>&#9650; nach innen bewegt</span>
+    <span>&#9660; nach außen bewegt</span>
+    <span>&#9733; neu</span>
+    <span>&#11044; unverändert</span>
+  </p>
+</div>
+
+<!-- Kontext -->
+<div class="panel">
+  <h3>Worum geht es?</h3>
+  <p>
+    Der EnBW AI &amp; Emerging Technology Radar ist das zentrale Steuerungs- und
+    Kommunikationsinstrument für KI und neue Technologien in der digitalen Einheit C-TD und der
+    EnBW Agentic Factory. Er macht Technologieentscheidungen für technische und nicht-technische
+    Stakeholder sichtbar und nachvollziehbar. Die Einordnung in einen Ring drückt aus, wie wir
+    eine Technologie heute im EnBW-Kontext einschätzen.
+  </p>
+</div>
+
 <script>
+// Einzige Quelle der Wahrheit für Segmente und Ringe: speist Radar, Tooltips und Legende.
+const SEGMENTS = [
+  { name: "AI Capabilities",          description: "Grundlegende KI-Fähigkeiten und Modellkompetenzen, die Anwendungen technisch möglich machen." },
+  { name: "Data & AI Tools",          description: "Konkrete Werkzeuge und Produkte, mit denen Mitarbeitende KI im Alltag nutzen." },
+  { name: "Data & AI Infrastructure", description: "Plattformen, Modelle und Bausteine, auf denen KI-Lösungen betrieben werden." },
+  { name: "Security & Governance",    description: "Regeln, Schutzmechanismen und Compliance für den sicheren KI-Einsatz." },
+  { name: "Anwendungsfelder",         description: "Konkrete Einsatzgebiete, in denen KI Geschäftswert schafft." },
+  { name: "Methods",                  description: "Vorgehensweisen, Praktiken und Muster für die Arbeit mit KI." },
+];
+
+const RINGS = [
+  { name: "SCALE", color: "#5ba300", description: "Aktiv empfohlen, bewährt und produktiv einsetzbar im EnBW-Kontext." },
+  { name: "PILOT", color: "#009eb0", description: "Pilotieren, konkrete Erprobung läuft oder ist empfohlen." },
+  { name: "WATCH", color: "#c7ba00", description: "Beobachten, relevant, aber noch kein Invest." },
+  { name: "STOP",  color: "#e09b96", description: "Bewusster Stop, nicht weiter investieren." },
+];
+
 fetch('./config.json').then(function(response) {
   return response.json();
 }).then(function(data) {
   radar_visualization({
-    repo_url: "https://github.com/zalando/tech-radar",
-    title: "Zalando Tech Radar",
+    repo_url: "https://github.com/enbw/tech-radar",
+    title: "EnBW AI & Emerging Technology Radar",
     date: data.date,
-    quadrants: [
-      { name: "Languages" },
-      { name: "Infrastructure" },
-      { name: "Datastores" },
-      { name: "Data Management" },
-    ],
-    rings: [
-      { name: "ADOPT", color: "#5ba300" },
-      { name: "TRIAL", color: "#009eb0" },
-      { name: "ASSESS", color: "#c7ba00" },
-      { name: "HOLD", color: "#e09b96" }
-    ],
-    entries: data.entries
+    width: 1600,
+    height: 1300,
+    title_offset:  { x: -790, y: -630 },
+    footer_offset: { x: -200, y: 600 },
+    quadrants: SEGMENTS.map(function(s) { return { name: s.name }; }),
+    rings: RINGS.map(function(r) { return { name: r.name, color: r.color }; }),
+    print_layout: true,
+    links_in_new_tabs: true,
+    entries: data.entries,
   });
+
+  buildHelp();
+  buildRingLegend();
 }).catch(function(err) {
   console.log('Error loading config.json', err);
 });
+
+// Tooltip-Inhalte aus SEGMENTS / RINGS aufbauen
+function buildHelp() {
+  var seg = document.getElementById('help-pop-segments');
+  seg.innerHTML = '<strong>Die sechs Segmente</strong>' + SEGMENTS.map(function(s) {
+    return '<span class="hp-item"><b>' + escapeHtml(s.name) + '</b>' + escapeHtml(s.description) + '</span>';
+  }).join('');
+
+  var rng = document.getElementById('help-pop-rings');
+  rng.innerHTML = '<strong>Die vier Ringe</strong>' + RINGS.map(function(r) {
+    return '<span class="hp-item"><b style="color:' + r.color + '">' + escapeHtml(r.name) + '</b>' + escapeHtml(r.description) + '</span>';
+  }).join('');
+}
+
+function buildRingLegend() {
+  var ul = document.getElementById('ring-legend');
+  ul.innerHTML = RINGS.map(function(r) {
+    return '<li><span class="ring-dot" style="background:' + r.color + '"></span>' +
+           '<span class="ring-name" style="color:' + r.color + '">' + escapeHtml(r.name) + '</span>' +
+           '<span class="ring-desc">' + escapeHtml(r.description) + '</span></li>';
+  }).join('');
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, function(c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+// Info-Box schließen, mit Fokus-Rückgabe an das öffnende Element
+function closeBlipInfo() {
+  var panel = document.getElementById('blip-info');
+  if (getComputedStyle(panel).display === 'none') return;
+  panel.style.display = 'none';
+  if (panel._opener && typeof panel._opener.focus === 'function') {
+    panel._opener.focus();
+  }
+}
+document.querySelector('#blip-info .bi-close').addEventListener('click', closeBlipInfo);
+// Escape schließt die Info-Box (Dialog-Konvention)
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeBlipInfo();
+});
 </script>
-
-<table>
-<tr>
-<td>
-
-<h3>What is the Tech Radar?</h3>
-
-<p>
-The Zalando Tech Radar is a list of technologies, complemented by an assessment result, called <em>ring assignment</em>. We use four rings with the following semantics:
-</p>
-
-<ul>
-<li><strong>ADOPT</strong> &mdash; Technologies we have high confidence in to serve our purpose, also in large scale. Technologies with a usage culture in our Zalando production environment, low risk and recommended to be widely used.</li>
-<li><strong>TRIAL</strong> &mdash; Technologies that we have seen work with success in project work to solve a real problem; first serious usage experience that confirm benefits and can uncover limitations. TRIAL technologies are slightly more risky; some engineers in our organization walked this path and will share knowledge and experiences.</li>
-<li><strong>ASSESS</strong> &mdash; Technologies that are promising and have clear potential value-add for us; technologies worth to invest some research and prototyping efforts in to see if it has impact. ASSESS technologies have higher risks; they are often brand new and highly unproven in our organisation. You will find some engineers that have knowledge in the technology and promote it, you may even find teams that have started a prototyping effort.</li>
-<li><strong>HOLD</strong> &mdash; Technologies not recommended to be used for new projects. Technologies that we think are not (yet) worth to (further) invest in. HOLD technologies should not be used for new projects, but usually can be continued for existing projects.</li>
-</ul>
-
-</td><td>
-
-<h3>What is the purpose?</h3>
-
-<p>
-The Tech Radar is a tool to inspire and support Engineering teams at Zalando to pick the best technologies for new projects; it provides a platform to share knowledge and experience in technologies, to reflect on technology decisions and continuously evolve our technology landscape. Based on the <a href="https://www.thoughtworks.com/radar">pioneering work of ThoughtWorks</a>, our Tech Radar sets out the changes in technologies that are interesting in software development &mdash; changes that we think our engineering teams should pay attention to and use in their projects.
-</p>
-
-<h3>How do we maintain it?</h3>
-
-<p>
-The Tech Radar is maintained by our <em>Principal Engineers</em> &mdash; who facilitate and drive the technology selection discussions at Zalando across the Engineering Community. Assignment of technologies to rings is the outcome of ring change proposals, which are discussed and voted on. The Tech Radar is open for contribution for all Engineering teams at Zalando and depends on their active participation to share lessons learned, pitfalls, and contribute to good practices on using the technologies.<br/>
-</p>
-
-<p>
-Check out our <a href="https://engineering.zalando.com/tags/tech-radar.html">Engineering Blog</a> for more information on how we approach Technology Selection and use the Tech Radar at Zalando.
-</p>
-
-<p>
-<em>BTW, if you would like to create your own Tech Radar &mdash; we have <a href="https://github.com/zalando/tech-radar">open sourced the code</a> to generate this visualization.</em>
-</p>
-
-</td></tr>
-</table>
 
 </body>
 </html>

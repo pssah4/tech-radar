@@ -1,25 +1,208 @@
 body {
   font-family: 'Source Sans Pro', arial, helvetica, sans-serif;
   padding-bottom: 50px;
+  color: #1a1a1a;
 }
-h3 {
-  margin-top: 50px;
+
+/* Radar skaliert responsiv (viewBox in radar.js gesetzt) */
+svg#radar {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
-li {
-  margin: 25px 50px 0 0;
-}
-table {
-  width: 1400px;
-  margin: 0 50px 0 50px;
-}
-td {
-  width: 50%;
-  vertical-align: top;
-  padding-right: 60px;
-}
+
 .hover-underline {
   text-decoration: none;
 }
 .hover-underline:hover {
   text-decoration: underline;
+}
+
+/* Hilfsleiste mit "?"-Tooltips */
+#help-bar {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 1000px;
+  margin: 24px auto 0;
+  padding: 0 24px;
+  font-size: 14px;
+}
+.help-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.help-label {
+  font-weight: bold;
+}
+#help-hint {
+  margin-left: auto;
+  color: #888;
+  font-size: 13px;
+}
+.help {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #333;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+.help:focus {
+  outline: 2px solid #009eb0;
+  outline-offset: 2px;
+}
+.help-pop {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 28px;
+  left: 0;
+  z-index: 50;
+  width: 320px;
+  max-width: calc(100vw - 32px);
+  background: #fff;
+  color: #333;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  padding: 12px 14px;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: normal;
+  transition: opacity 0.12s ease;
+}
+.help:hover .help-pop,
+.help:focus .help-pop {
+  visibility: visible;
+  opacity: 1;
+}
+.help-pop strong {
+  display: block;
+  margin-bottom: 8px;
+}
+.hp-item {
+  display: block;
+  margin: 7px 0;
+}
+.hp-item b {
+  display: block;
+}
+
+/* Info-Box beim Klick auf einen Blip */
+.blip-info {
+  display: none;
+  position: fixed;
+  top: 70px;
+  right: 24px;
+  z-index: 100;
+  width: 300px;
+  max-width: 80vw;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-left: 6px solid #333;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+  padding: 16px 18px;
+}
+.bi-close {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+}
+.bi-close:hover {
+  color: #333;
+}
+.bi-title {
+  font-weight: bold;
+  font-size: 16px;
+  margin: 0 24px 4px 0;
+}
+.bi-meta {
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.bi-desc {
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Inhalts-Panels unter dem Radar */
+.panel {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 24px;
+}
+.panel h3 {
+  margin-top: 30px;
+}
+.panel p {
+  line-height: 1.5;
+}
+
+/* Ring-Legende */
+.ring-legend {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ring-legend li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin: 12px 0;
+}
+.ring-dot {
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  position: relative;
+  top: 2px;
+}
+.ring-name {
+  flex: 0 0 70px;
+  font-weight: bold;
+}
+.ring-desc {
+  color: #333;
+}
+
+/* Prozess-Beschreibung */
+.process {
+  margin: 12px 0;
+  padding-left: 22px;
+}
+.process li {
+  margin: 10px 0;
+  line-height: 1.5;
+}
+.movement-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+  margin-top: 14px;
+  font-size: 13px;
+  color: #555;
+}
+.movement-legend span {
+  white-space: nowrap;
 }

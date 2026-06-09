@@ -1,598 +1,87 @@
 {
-  "date": "2026.05",
+  "date": "2026.Q3",
   "entries": [
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "AWS Athena",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "AWS EMR",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 2,
-      "label": "AWS Glue",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 2,
-      "label": "AWS Lake Formation",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "Amazon Translate",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Apache Airflow",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Databricks",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Flink",
-      "link": "https://engineering.zalando.com/tags/apache-flink.html",
-      "active": true,
-      "moved": 1
-    },
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "Google BigQuery",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "Presto",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Spark",
-      "link": "https://engineering.zalando.com/tags/apache-spark.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 2,
-      "label": "Streamlit",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "dbt",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 1,
-      "label": "AWS DocumentDB",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "AWS DynamoDB",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "AWS S3",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "Amazon ElastiCache",
-      "link": "https://engineering.zalando.com/tags/redis.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 2,
-      "label": "Amazon MemoryDB",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 1,
-      "label": "Amazon Neptune",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "Amazon Redshift",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 1,
-      "label": "Amazon SageMaker Feature Store",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Apache Cassandra",
-      "link": "https://engineering.zalando.com/tags/cassandra.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Consul",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 1,
-      "label": "Druid",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "Elasticsearch",
-      "link": "https://engineering.zalando.com/tags/elasticsearch.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "HBase",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 1,
-      "label": "HDFS",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Hazelcast",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Memcached",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "MongoDB",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "MySQL",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Oracle DB",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 0,
-      "label": "PostgreSQL",
-      "link": "https://engineering.zalando.com/tags/postgresql.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Redis",
-      "link": "https://engineering.zalando.com/tags/redis.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "Solr",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 2,
-      "label": "Valkey",
-      "link": "https://engineering.zalando.com/tags/redis.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 2,
-      "ring": 3,
-      "label": "ZooKeeper",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "AWS CloudFormation",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "AWS CloudFront",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "AWS EKS",
-      "active": true,
-      "moved": 1
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "AWS Elemental MediaConvert",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "AWS Lambda",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 2,
-      "label": "AWS Service Catalog",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "AWS Step Functions",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "AWS Transcribe",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "Agentgateway",
-      "active": true,
-      "moved": 2
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "Amazon Bedrock",
-      "active": true,
-      "moved": 1
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "Amazon SageMaker",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "Docker",
-      "link": "https://engineering.zalando.com/tags/docker.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 3,
-      "label": "GraalVM",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 2,
-      "label": "Kotlin Multiplatform",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "Kubernetes",
-      "link": "https://engineering.zalando.com/tags/kubernetes.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "LiteLLM",
-      "active": true,
-      "moved": 1
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "Open Policy Agent",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "OpenTelemetry",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "Skipper",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 2,
-      "label": "Slurm",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 1,
-      "label": "WebAssembly",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 0,
-      "label": "ZMON",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 1,
-      "ring": 2,
-      "label": "mem0",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 3,
-      "label": "Clojure",
-      "link": "https://engineering.zalando.com/tags/clojure.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 1,
-      "label": "Dart",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Go",
-      "link": "https://engineering.zalando.com/tags/golang.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "GraphQL",
-      "link": "https://engineering.zalando.com/tags/graphql.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 3,
-      "label": "Haskell",
-      "link": "https://engineering.zalando.com/tags/haskell.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Java",
-      "link": "https://engineering.zalando.com/tags/java.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "JavaScript",
-      "link": "https://engineering.zalando.com/tags/javascript.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Kotlin",
-      "link": "https://engineering.zalando.com/tags/kotlin.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "OpenAPI (Swagger)",
-      "link": "https://engineering.zalando.com/tags/openapi.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Python",
-      "link": "https://engineering.zalando.com/tags/python.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 2,
-      "label": "R",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 3,
-      "label": "Rust",
-      "link": "https://engineering.zalando.com/tags/rust.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Scala",
-      "link": "https://engineering.zalando.com/tags/scala.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "Swift",
-      "link": "https://engineering.zalando.com/tags/swift.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 0,
-      "ring": 0,
-      "label": "TypeScript",
-      "link": "https://engineering.zalando.com/tags/typescript.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "AWS Kinesis",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "AWS SNS",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "AWS SQS",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Kafka",
-      "link": "https://engineering.zalando.com/tags/apache-kafka.html",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 0,
-      "label": "Nakadi",
-      "link": "https://nakadi.io",
-      "active": true,
-      "moved": 0
-    },
-    {
-      "quadrant": 3,
-      "ring": 1,
-      "label": "RabbitMQ",
-      "link": "https://engineering.zalando.com/tags/rabbitmq.html",
-      "active": true,
-      "moved": 0
-    }
+    { "quadrant": 0, "ring": 0, "label": "Agentic Tool Use", "active": true, "moved": 0, "link": "", "description": "Modelle nutzen Werkzeuge und APIs eigenständig, um Aufgaben in mehreren Schritten zu lösen." },
+    { "quadrant": 0, "ring": 0, "label": "Document & Layout Understanding", "active": true, "moved": 0, "link": "", "description": "Automatisches Erfassen von Struktur, Layout und Inhalt aus Dokumenten und Formularen." },
+    { "quadrant": 0, "ring": 0, "label": "Embedding & Semantic Search", "active": true, "moved": 0, "link": "", "description": "Vektorbasierte Repräsentation von Inhalten für semantische Suche und Retrieval." },
+    { "quadrant": 0, "ring": 0, "label": "Code Generation", "active": true, "moved": 0, "link": "", "description": "KI erzeugt, vervollständigt und refactored Quellcode aus natürlicher Sprache." },
+    { "quadrant": 0, "ring": 1, "label": "Reasoning & Planning", "active": true, "moved": 0, "link": "", "description": "Mehrstufiges Schlussfolgern und Planen komplexer Aufgaben durch das Modell." },
+    { "quadrant": 0, "ring": 1, "label": "Multimodal Understanding", "active": true, "moved": 0, "link": "", "description": "Gemeinsame Verarbeitung von Text, Bild, Audio und weiteren Modalitäten." },
+    { "quadrant": 0, "ring": 2, "label": "Computer Use / UI Automation", "active": true, "moved": 0, "link": "", "description": "Modelle bedienen grafische Oberflächen wie ein menschlicher Nutzer." },
+    { "quadrant": 0, "ring": 2, "label": "Speech & Audio", "active": true, "moved": 0, "link": "", "description": "Spracherkennung, Sprachsynthese und das Verstehen von Audioinhalten." },
+    { "quadrant": 0, "ring": 2, "label": "Domain-specific AI (Energie/OT)", "active": true, "moved": 0, "link": "", "description": "Auf Energie- und OT-Domänen zugeschnittene Modelle und Datengrundlagen." },
+    { "quadrant": 0, "ring": 2, "label": "Sovereign AI", "active": true, "moved": 0, "link": "", "description": "KI-Betrieb unter voller Daten- und Technologiehoheit in europäischer Kontrolle." },
+
+    { "quadrant": 1, "ring": 0, "label": "GitHub Copilot", "active": true, "moved": 0, "link": "", "description": "KI-Assistent für Codevervollständigung und Entwicklung direkt in der IDE." },
+    { "quadrant": 1, "ring": 0, "label": "Microsoft Copilot", "active": true, "moved": 0, "link": "", "description": "KI-Assistent in Microsoft 365 für Texte, Tabellen und Präsentationen." },
+    { "quadrant": 1, "ring": 0, "label": "Copilot Studio", "active": true, "moved": 0, "link": "", "description": "Low-Code-Plattform zum Bauen eigener Copilot-Agenten und Workflows." },
+    { "quadrant": 1, "ring": 0, "label": "Cognigy.AI", "active": true, "moved": 0, "link": "", "description": "Conversational-AI-Plattform für Kundenservice und Voice-Bots." },
+    { "quadrant": 1, "ring": 0, "label": "Canva AI", "active": true, "moved": 0, "link": "", "description": "KI-gestütztes Gestalten von Grafiken, Präsentationen und Marketingmaterial." },
+    { "quadrant": 1, "ring": 1, "label": "Claude Code", "active": true, "moved": 0, "link": "", "description": "Agentisches CLI- und IDE-Werkzeug von Anthropic für die Softwareentwicklung." },
+    { "quadrant": 1, "ring": 1, "label": "Perplexity", "active": true, "moved": 0, "link": "", "description": "KI-Suchmaschine mit quellenbasierten Antworten und Recherche." },
+    { "quadrant": 1, "ring": 1, "label": "Databricks Genie", "active": true, "moved": 0, "link": "", "description": "Natürlichsprachiges Abfragen von Daten im Databricks-Lakehouse." },
+    { "quadrant": 1, "ring": 1, "label": "CodeRabbit", "active": true, "moved": 0, "link": "", "description": "KI-gestützte automatisierte Code-Reviews in Pull Requests." },
+    { "quadrant": 1, "ring": 2, "label": "Langdock", "active": true, "moved": 0, "link": "", "description": "Unternehmensplattform für KI-Assistenten und Workflows auf eigenen Daten." },
+    { "quadrant": 1, "ring": 2, "label": "Workday Sana", "active": true, "moved": 0, "link": "", "description": "KI-Suche und Wissensassistent über Unternehmensanwendungen hinweg." },
+    { "quadrant": 1, "ring": 2, "label": "Craft Agents", "active": true, "moved": 0, "link": "", "description": "Agentische Funktionen in der Craft-Dokumenten- und Wissensplattform." },
+
+    { "quadrant": 2, "ring": 0, "label": "CCGenAI Model Garden", "active": true, "moved": 0, "link": "", "description": "Zentraler EnBW-Katalog freigegebener generativer KI-Modelle." },
+    { "quadrant": 2, "ring": 0, "label": "Azure AI Foundry", "active": true, "moved": 0, "link": "", "description": "Microsoft-Plattform zum Entwickeln, Betreiben und Verwalten von KI-Anwendungen." },
+    { "quadrant": 2, "ring": 0, "label": "AWS Bedrock", "active": true, "moved": 0, "link": "", "description": "Verwalteter Zugang zu Foundation Models über die AWS-Cloud." },
+    { "quadrant": 2, "ring": 0, "label": "Azure AI Search", "active": true, "moved": 0, "link": "", "description": "Vektor- und Volltextsuche als Retrieval-Backend für RAG." },
+    { "quadrant": 2, "ring": 0, "label": "Azure AI Document Intelligence", "active": true, "moved": 0, "link": "", "description": "Dienst zum Extrahieren von Struktur und Daten aus Dokumenten." },
+    { "quadrant": 2, "ring": 0, "label": "RAG Stack", "active": true, "moved": 0, "link": "", "description": "Architekturbausteine für Retrieval-Augmented Generation." },
+    { "quadrant": 2, "ring": 0, "label": "GPT-4o / GPT-5", "active": true, "moved": 0, "link": "", "description": "OpenAI-Sprachmodelle als Basis für generative Anwendungen." },
+    { "quadrant": 2, "ring": 0, "label": "Claude 3.5 / Claude 4", "active": true, "moved": 0, "link": "", "description": "Anthropic-Sprachmodelle mit Fokus auf Reasoning und Agentik." },
+    { "quadrant": 2, "ring": 0, "label": "Amazon Textract", "active": true, "moved": 0, "link": "", "description": "AWS-Dienst zur Texterkennung und Datenextraktion aus Dokumenten." },
+    { "quadrant": 2, "ring": 1, "label": "LiteLLM", "active": true, "moved": 0, "link": "", "description": "Einheitliches Proxy-Gateway für den Zugriff auf viele LLM-Anbieter." },
+    { "quadrant": 2, "ring": 1, "label": "Langfuse", "active": true, "moved": 0, "link": "", "description": "Observability und Tracing für LLM-Anwendungen." },
+    { "quadrant": 2, "ring": 1, "label": "Databricks MLflow", "active": true, "moved": 0, "link": "", "description": "Plattform für Experiment-Tracking und den Modell-Lifecycle." },
+    { "quadrant": 2, "ring": 1, "label": "n8n", "active": true, "moved": 0, "link": "", "description": "Workflow-Automatisierung zum Verketten von Diensten und KI-Aufgaben." },
+    { "quadrant": 2, "ring": 1, "label": "UIPath", "active": true, "moved": 0, "link": "", "description": "RPA-Plattform für regelbasierte und KI-gestützte Prozessautomatisierung." },
+    { "quadrant": 2, "ring": 1, "label": "Mistral", "active": true, "moved": 0, "link": "", "description": "Europäische offene und kommerzielle Sprachmodelle." },
+    { "quadrant": 2, "ring": 1, "label": "FinOps Stack (Power BI + #42)", "active": true, "moved": 0, "link": "", "description": "Kostentransparenz und Steuerung für KI-Workloads über Power BI." },
+    { "quadrant": 2, "ring": 1, "label": "Databricks Semantic Layer", "active": true, "moved": 0, "link": "", "description": "Einheitliche semantische Schicht über Daten für konsistente Metriken." },
+    { "quadrant": 2, "ring": 2, "label": "Agent Registry (Agent 365)", "active": true, "moved": 0, "link": "", "description": "Verzeichnis und Verwaltung von KI-Agenten im Microsoft-Ökosystem." },
+    { "quadrant": 2, "ring": 2, "label": "MCP-Registry & Gateway", "active": true, "moved": 0, "link": "", "description": "Zentrale Registrierung und Vermittlung von Model-Context-Protocol-Servern." },
+    { "quadrant": 2, "ring": 2, "label": "Skill-Registry", "active": true, "moved": 0, "link": "", "description": "Katalog wiederverwendbarer Agenten-Fähigkeiten und Werkzeuge." },
+    { "quadrant": 2, "ring": 2, "label": "Llama (Open Source)", "active": true, "moved": 0, "link": "", "description": "Offene Sprachmodelle von Meta für den Eigenbetrieb." },
+
+    { "quadrant": 3, "ring": 0, "label": "EU AI Act Risk Classification", "active": true, "moved": 0, "link": "", "description": "Einordnung von KI-Systemen in die Risikoklassen des EU AI Act." },
+    { "quadrant": 3, "ring": 0, "label": "Microsoft Defender for AI", "active": true, "moved": 0, "link": "", "description": "Schutz und Bedrohungserkennung für KI-Workloads in Microsoft-Umgebungen." },
+    { "quadrant": 3, "ring": 0, "label": "DSGVO-Patterns für AI", "active": true, "moved": 0, "link": "", "description": "Wiederverwendbare Muster für datenschutzkonforme KI-Verarbeitung." },
+    { "quadrant": 3, "ring": 1, "label": "Azure Entra Agent ID", "active": true, "moved": 0, "link": "", "description": "Identitäten und Zugriffssteuerung für KI-Agenten." },
+    { "quadrant": 3, "ring": 1, "label": "AI Audit Trails", "active": true, "moved": 0, "link": "", "description": "Nachvollziehbare Protokollierung von KI-Entscheidungen und -Aktionen." },
+    { "quadrant": 3, "ring": 1, "label": "Responsible AI Framework", "active": true, "moved": 0, "link": "", "description": "Leitplanken für fairen, transparenten und sicheren KI-Einsatz." },
+    { "quadrant": 3, "ring": 2, "label": "Post-Quantum Cryptography", "active": true, "moved": 0, "link": "", "description": "Verschlüsselungsverfahren, die auch gegen Quantencomputer bestehen." },
+    { "quadrant": 3, "ring": 2, "label": "OT/IT-Sicherheit für AI-Systeme", "active": true, "moved": 0, "link": "", "description": "Absicherung von KI in vernetzten OT- und IT-Umgebungen." },
+    { "quadrant": 3, "ring": 2, "label": "Red Teaming / Adversarial Robustness", "active": true, "moved": 0, "link": "", "description": "Gezieltes Angreifen von KI-Systemen zur Härtung gegen Missbrauch." },
+
+    { "quadrant": 4, "ring": 0, "label": "Agentic Document Processing", "active": true, "moved": 0, "link": "", "description": "Agenten verarbeiten Dokumente end-to-end von der Extraktion bis zur Entscheidung." },
+    { "quadrant": 4, "ring": 0, "label": "Conversational AI (Kundenservice)", "active": true, "moved": 0, "link": "", "description": "Dialogsysteme für automatisierten Kundenservice über Chat und Voice." },
+    { "quadrant": 4, "ring": 0, "label": "AI-assisted Software Development", "active": true, "moved": 0, "link": "", "description": "KI unterstützt den gesamten Entwicklungsprozess von Code bis Review." },
+    { "quadrant": 4, "ring": 1, "label": "Multi-Agent Research & Analysis", "active": true, "moved": 0, "link": "", "description": "Mehrere Agenten recherchieren und analysieren arbeitsteilig." },
+    { "quadrant": 4, "ring": 1, "label": "Agentic Process Automation", "active": true, "moved": 0, "link": "", "description": "Agenten automatisieren Geschäftsprozesse über Systemgrenzen hinweg." },
+    { "quadrant": 4, "ring": 1, "label": "Predictive Maintenance mit AI", "active": true, "moved": 0, "link": "", "description": "Vorausschauende Wartung von Anlagen auf Basis von KI-Prognosen." },
+    { "quadrant": 4, "ring": 1, "label": "AI für Reporting & Analytics", "active": true, "moved": 0, "link": "", "description": "KI erstellt Auswertungen, Berichte und Erkenntnisse aus Daten." },
+    { "quadrant": 4, "ring": 1, "label": "Autonomous Coding Agents", "active": true, "moved": 0, "link": "", "description": "Agenten setzen Entwicklungsaufgaben weitgehend eigenständig um." },
+    { "quadrant": 4, "ring": 2, "label": "AI für Grid/Netz-Optimierung", "active": true, "moved": 0, "link": "", "description": "KI optimiert Betrieb und Auslastung von Energienetzen." },
+    { "quadrant": 4, "ring": 2, "label": "Humanoide Roboter", "active": true, "moved": 0, "link": "", "description": "Menschenähnliche Roboter für physische Aufgaben." },
+    { "quadrant": 4, "ring": 2, "label": "Drohnen-Automatisierung mit AI", "active": true, "moved": 0, "link": "", "description": "KI-gesteuerte Drohnen für Inspektion und Überwachung." },
+    { "quadrant": 4, "ring": 2, "label": "Physical AI / Robotics", "active": true, "moved": 0, "link": "", "description": "KI für Wahrnehmung und Steuerung physischer Systeme." },
+    { "quadrant": 4, "ring": 2, "label": "AI für Energiemarkt-Prognosen", "active": true, "moved": 0, "link": "", "description": "KI prognostiziert Preise und Mengen an den Energiemärkten." },
+
+    { "quadrant": 5, "ring": 0, "label": "Prompt Engineering", "active": true, "moved": 0, "link": "", "description": "Systematisches Gestalten von Prompts für verlässliche Modellantworten." },
+    { "quadrant": 5, "ring": 0, "label": "RAG als Architekturmuster", "active": true, "moved": 0, "link": "", "description": "Verankern von LLM-Antworten in abgerufenem Wissen als Standardmuster." },
+    { "quadrant": 5, "ring": 1, "label": "Vibe Coding", "active": true, "moved": 0, "link": "", "description": "Explorative, KI-geführte Entwicklung mit natürlicher Sprache." },
+    { "quadrant": 5, "ring": 1, "label": "Spec Driven Development", "active": true, "moved": 0, "link": "", "description": "Entwicklung ausgehend von präzisen Spezifikationen als Quelle der Wahrheit." },
+    { "quadrant": 5, "ring": 1, "label": "Agentic Patterns (ReAct, Tool Use, Memory)", "active": true, "moved": 0, "link": "", "description": "Wiederkehrende Entwurfsmuster für agentische KI-Systeme." },
+    { "quadrant": 5, "ring": 1, "label": "AI-assisted Code Review", "active": true, "moved": 0, "link": "", "description": "KI unterstützt Code-Reviews durch Vorschläge und Prüfungen." },
+    { "quadrant": 5, "ring": 1, "label": "LLMOps / MLOps als Disziplin", "active": true, "moved": 0, "link": "", "description": "Betrieb, Versionierung und Überwachung von KI-Modellen als gelebte Praxis." },
+    { "quadrant": 5, "ring": 1, "label": "AI Literacy (Knowledge Worker)", "active": true, "moved": 0, "link": "", "description": "Befähigung der Belegschaft zum kompetenten Umgang mit KI." },
+    { "quadrant": 5, "ring": 1, "label": "Human-in-the-Loop Design", "active": true, "moved": 0, "link": "", "description": "Gezielte Einbindung menschlicher Kontrolle in KI-Prozesse." },
+    { "quadrant": 5, "ring": 1, "label": "FinOps für AI (Methodik)", "active": true, "moved": 0, "link": "", "description": "Methodik zur Kostensteuerung und Wirtschaftlichkeit von KI." },
+    { "quadrant": 5, "ring": 2, "label": "Multi-Agent Orchestration Patterns", "active": true, "moved": 0, "link": "", "description": "Muster zur Koordination mehrerer zusammenarbeitender Agenten." },
+    { "quadrant": 5, "ring": 2, "label": "Test Driven Development für AI", "active": true, "moved": 0, "link": "", "description": "Testgetriebenes Vorgehen für KI-gestützte Systeme." }
   ]
 }
