@@ -15,41 +15,58 @@
 
 <body>
 
-<!-- Hilfsleiste mit "?"-Tooltips für Segmente und Ringe -->
-<div id="help-bar">
-  <span class="help-group">
-    <span class="help-label">Segmente</span>
-    <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Segmente" aria-describedby="help-pop-segments">?
-      <span class="help-pop" id="help-pop-segments" role="tooltip"></span>
+<header class="site-header">
+  <h1>EnBW AI &amp; Emerging Technology Radar</h1>
+  <div class="subhead">
+    <span class="stand">Stand 2026.Q3</span>
+    <span class="help-bar">
+      <span class="help-group">
+        <span class="help-label">Segmente</span>
+        <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Segmente" aria-describedby="help-pop-segments">?
+          <span class="help-pop" id="help-pop-segments" role="tooltip"></span>
+        </span>
+      </span>
+      <span class="help-group">
+        <span class="help-label">Ringe</span>
+        <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Ringe" aria-describedby="help-pop-rings">?
+          <span class="help-pop" id="help-pop-rings" role="tooltip"></span>
+        </span>
+      </span>
     </span>
-  </span>
-  <span class="help-group">
-    <span class="help-label">Ringe</span>
-    <span class="help" tabindex="0" role="button" aria-label="Beschreibung der Ringe" aria-describedby="help-pop-rings">?
-      <span class="help-pop" id="help-pop-rings" role="tooltip"></span>
-    </span>
-  </span>
-  <span id="help-hint">Tipp: Einzelnen Blip anklicken für Details</span>
-</div>
+  </div>
+</header>
 
 <svg id="radar"></svg>
 
-<!-- Info-Box: erscheint beim Klick auf einen Blip -->
-<div id="blip-info" class="blip-info" role="dialog" aria-modal="true" aria-label="Blip-Details">
+<!-- Info-Box: erscheint beim Klick auf einen Blip oder einen Legenden-Eintrag -->
+<div id="blip-info" class="blip-info" role="dialog" aria-label="Blip-Details">
   <button class="bi-close" type="button" aria-label="Schließen">&times;</button>
   <div class="bi-title"></div>
   <div class="bi-meta"></div>
   <p class="bi-desc"></p>
 </div>
 
-<!-- Ring-Legende -->
-<div class="panel">
+<!-- Einträge nach Segment, klar gruppiert (Nummer am Blip = Nummer hier) -->
+<section class="panel">
+  <h3>Einträge nach Segment</h3>
+  <p class="hint-line">Eintrag anklicken für Details, mit der Maus überfahren hebt den passenden Punkt im Radar hervor.</p>
+  <div id="segment-legend" class="segment-legend"></div>
+</section>
+
+<!-- Ring-Legende und Bewegungs-Indikatoren -->
+<section class="panel">
   <h3>Die vier Ringe</h3>
   <ul id="ring-legend" class="ring-legend"></ul>
-</div>
+  <p class="movement-legend">
+    <span>&#9650; nach innen bewegt</span>
+    <span>&#9660; nach außen bewegt</span>
+    <span>&#9733; neu</span>
+    <span>&#11044; unverändert</span>
+  </p>
+</section>
 
 <!-- Dokumentierter Intake- und Bewegungs-Prozess -->
-<div class="panel">
+<section class="panel">
   <h3>Wie Einträge in den Radar kommen und sich bewegen</h3>
   <p>
     Der Radar ist ein lebendes Dokument und wird quartalsweise gepflegt. Neue Technologien,
@@ -68,16 +85,10 @@
     <li><strong>Bewegung sichtbar machen.</strong> Jede Veränderung wird am Blip markiert, damit
       Stakeholder die Entwicklung auf einen Blick erkennen.</li>
   </ol>
-  <p class="movement-legend">
-    <span>&#9650; nach innen bewegt</span>
-    <span>&#9660; nach außen bewegt</span>
-    <span>&#9733; neu</span>
-    <span>&#11044; unverändert</span>
-  </p>
-</div>
+</section>
 
 <!-- Kontext -->
-<div class="panel">
+<section class="panel">
   <h3>Worum geht es?</h3>
   <p>
     Der EnBW AI &amp; Emerging Technology Radar ist das zentrale Steuerungs- und
@@ -86,70 +97,126 @@
     Stakeholder sichtbar und nachvollziehbar. Die Einordnung in einen Ring drückt aus, wie wir
     eine Technologie heute im EnBW-Kontext einschätzen.
   </p>
-</div>
+</section>
 
 <script>
 // Einzige Quelle der Wahrheit für Segmente und Ringe: speist Radar, Tooltips und Legende.
+// fill = helle Flächenfarbe im Radar, accent = kräftige Farbe für Label und Kartenkopf.
 const SEGMENTS = [
-  { name: "AI Capabilities",          description: "Grundlegende KI-Fähigkeiten und Modellkompetenzen, die Anwendungen technisch möglich machen." },
-  { name: "Data & AI Tools",          description: "Konkrete Werkzeuge und Produkte, mit denen Mitarbeitende KI im Alltag nutzen." },
-  { name: "Data & AI Infrastructure", description: "Plattformen, Modelle und Bausteine, auf denen KI-Lösungen betrieben werden." },
-  { name: "Security & Governance",    description: "Regeln, Schutzmechanismen und Compliance für den sicheren KI-Einsatz." },
-  { name: "Anwendungsfelder",         description: "Konkrete Einsatzgebiete, in denen KI Geschäftswert schafft." },
-  { name: "Methods",                  description: "Vorgehensweisen, Praktiken und Muster für die Arbeit mit KI." },
+  { name: "AI Capabilities",          fill: "#e7ecfd", accent: "#4263eb", description: "Grundlegende KI-Fähigkeiten und Modellkompetenzen, die Anwendungen technisch möglich machen." },
+  { name: "Data & AI Tools",          fill: "#fff0e3", accent: "#e8590c", description: "Konkrete Werkzeuge und Produkte, mit denen Mitarbeitende KI im Alltag nutzen." },
+  { name: "Data & AI Infrastructure", fill: "#efe9fc", accent: "#7048e8", description: "Plattformen, Modelle und Bausteine, auf denen KI-Lösungen betrieben werden." },
+  { name: "Security & Governance",    fill: "#fce8ef", accent: "#c2255c", description: "Regeln, Schutzmechanismen und Compliance für den sicheren KI-Einsatz." },
+  { name: "Anwendungsfelder",         fill: "#e6f6ea", accent: "#2f9e44", description: "Konkrete Einsatzgebiete, in denen KI Geschäftswert schafft." },
+  { name: "Methods",                  fill: "#f0ebe6", accent: "#846358", description: "Vorgehensweisen, Praktiken und Muster für die Arbeit mit KI." },
 ];
 
+// color = kräftige Blip-/Ringfarbe, labelColor = auf Weiß gut lesbare Variante fürs Label.
 const RINGS = [
-  { name: "SCALE", color: "#5ba300", description: "Aktiv empfohlen, bewährt und produktiv einsetzbar im EnBW-Kontext." },
-  { name: "PILOT", color: "#009eb0", description: "Pilotieren, konkrete Erprobung läuft oder ist empfohlen." },
-  { name: "WATCH", color: "#c7ba00", description: "Beobachten, relevant, aber noch kein Invest." },
-  { name: "STOP",  color: "#e09b96", description: "Bewusster Stop, nicht weiter investieren." },
+  { name: "SCALE", color: "#5ba300", labelColor: "#4d8b00", description: "Aktiv empfohlen, bewährt und produktiv einsetzbar im EnBW-Kontext." },
+  { name: "PILOT", color: "#009eb0", labelColor: "#0093a4", description: "Pilotieren, konkrete Erprobung läuft oder ist empfohlen." },
+  { name: "WATCH", color: "#c7ba00", labelColor: "#8a8000", description: "Beobachten, relevant, aber noch kein Invest." },
+  { name: "STOP",  color: "#e09b96", labelColor: "#cb5648", description: "Bewusster Stop, nicht weiter investieren." },
 ];
+
+// schwarz oder weiss als Textfarbe, je nach Helligkeit der Hintergrundfarbe
+function contrastText(color) {
+  var c = String(color || "").replace("#", "");
+  if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+  var r = parseInt(c.substr(0, 2), 16) / 255, g = parseInt(c.substr(2, 2), 16) / 255, b = parseInt(c.substr(4, 2), 16) / 255;
+  if (isNaN(r) || isNaN(g) || isNaN(b)) return "#ffffff";
+  return (0.2126 * r + 0.7152 * g + 0.0722 * b) > 0.45 ? "#1a1a1a" : "#ffffff";
+}
 
 fetch('./config.json').then(function(response) {
   return response.json();
 }).then(function(data) {
   radar_visualization({
-    repo_url: "https://github.com/enbw/tech-radar",
+    repo_url: "https://github.com/pssah4/tech-radar",
     title: "EnBW AI & Emerging Technology Radar",
     date: data.date,
-    width: 1600,
-    height: 1300,
-    title_offset:  { x: -790, y: -630 },
-    footer_offset: { x: -200, y: 600 },
-    quadrants: SEGMENTS.map(function(s) { return { name: s.name }; }),
-    rings: RINGS.map(function(r) { return { name: r.name, color: r.color }; }),
+    width: 1200,
+    height: 1000,
+    // Segmente und Ringe mit Farben; Titel/Footer/Rund-um-Legende sind aus, die Texte
+    // liegen als strukturiertes HTML um den Radar herum.
+    quadrants: SEGMENTS.map(function(s) { return { name: s.name, color: s.fill, accent: s.accent }; }),
+    rings: RINGS.map(function(r) { return { name: r.name, color: r.color, labelColor: r.labelColor }; }),
     print_layout: true,
+    draw_title: false,
+    draw_footer: false,
+    draw_legend: false,
     links_in_new_tabs: true,
     entries: data.entries,
   });
 
   buildHelp();
   buildRingLegend();
+  buildSegmentLegend(data.entries);
 }).catch(function(err) {
   console.log('Error loading config.json', err);
 });
 
 // Tooltip-Inhalte aus SEGMENTS / RINGS aufbauen
 function buildHelp() {
-  var seg = document.getElementById('help-pop-segments');
-  seg.innerHTML = '<strong>Die sechs Segmente</strong>' + SEGMENTS.map(function(s) {
-    return '<span class="hp-item"><b>' + escapeHtml(s.name) + '</b>' + escapeHtml(s.description) + '</span>';
-  }).join('');
-
-  var rng = document.getElementById('help-pop-rings');
-  rng.innerHTML = '<strong>Die vier Ringe</strong>' + RINGS.map(function(r) {
-    return '<span class="hp-item"><b style="color:' + r.color + '">' + escapeHtml(r.name) + '</b>' + escapeHtml(r.description) + '</span>';
-  }).join('');
+  document.getElementById('help-pop-segments').innerHTML =
+    '<strong>Die sechs Segmente</strong>' + SEGMENTS.map(function(s) {
+      return '<span class="hp-item"><b style="color:' + s.accent + '">' + escapeHtml(s.name) + '</b>' + escapeHtml(s.description) + '</span>';
+    }).join('');
+  document.getElementById('help-pop-rings').innerHTML =
+    '<strong>Die vier Ringe</strong>' + RINGS.map(function(r) {
+      return '<span class="hp-item"><b style="color:' + r.labelColor + '">' + escapeHtml(r.name) + '</b>' + escapeHtml(r.description) + '</span>';
+    }).join('');
 }
 
 function buildRingLegend() {
-  var ul = document.getElementById('ring-legend');
-  ul.innerHTML = RINGS.map(function(r) {
+  document.getElementById('ring-legend').innerHTML = RINGS.map(function(r) {
     return '<li><span class="ring-dot" style="background:' + r.color + '"></span>' +
-           '<span class="ring-name" style="color:' + r.color + '">' + escapeHtml(r.name) + '</span>' +
+           '<span class="ring-name" style="color:' + r.labelColor + '">' + escapeHtml(r.name) + '</span>' +
            '<span class="ring-desc">' + escapeHtml(r.description) + '</span></li>';
   }).join('');
+}
+
+// Karten-Raster: eine Karte pro Segment, Einträge nach Ring gruppiert, aufsteigend nach Nummer.
+function buildSegmentLegend(entries) {
+  var byId = {};
+  entries.forEach(function(e) { byId[e.id] = e; });
+
+  var html = SEGMENTS.map(function(seg, qi) {
+    var ringsHtml = RINGS.map(function(ring, ri) {
+      var items = entries
+        .filter(function(e) { return e.quadrant === qi && e.ring === ri; })
+        .sort(function(a, b) { return (+a.id) - (+b.id); });
+      if (!items.length) return '';
+      var lis = items.map(function(e) {
+        return '<li class="seg-item" id="legendItem' + e.id + '" data-id="' + e.id + '" tabindex="0">' +
+               '<span class="seg-num" style="background:' + ring.color + ';color:' + contrastText(ring.color) + '">' + e.id + '</span>' +
+               '<span class="seg-label">' + escapeHtml(e.label) + '</span></li>';
+      }).join('');
+      return '<div class="seg-ring">' +
+             '<span class="seg-ring-name" style="color:' + ring.labelColor + '">' + escapeHtml(ring.name) + '</span>' +
+             '<ul>' + lis + '</ul></div>';
+    }).join('');
+    return '<div class="seg-card" style="border-top-color:' + seg.accent + '">' +
+           '<div class="seg-card-head" style="color:' + seg.accent + '">' + escapeHtml(seg.name) + '</div>' +
+           '<div class="seg-card-body">' + ringsHtml + '</div></div>';
+  }).join('');
+
+  var container = document.getElementById('segment-legend');
+  container.innerHTML = html;
+
+  // Hover hebt den passenden Blip im Radar hervor; Klick öffnet die Info-Box.
+  container.querySelectorAll('.seg-item').forEach(function(li) {
+    var id = li.getAttribute('data-id');
+    var entry = byId[id];
+    function on()  { li.classList.add('legend-hl');    var b = document.getElementById('blip' + id); if (b) b.classList.add('hl'); }
+    function off() { li.classList.remove('legend-hl'); var b = document.getElementById('blip' + id); if (b) b.classList.remove('hl'); }
+    li.addEventListener('mouseenter', on);
+    li.addEventListener('mouseleave', off);
+    li.addEventListener('focus', on);
+    li.addEventListener('blur', off);
+    li.addEventListener('click', function() { if (window.radarShowInfo && entry) window.radarShowInfo(entry); });
+    li.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (window.radarShowInfo && entry) window.radarShowInfo(entry); } });
+  });
 }
 
 function escapeHtml(s) {
@@ -163,15 +230,10 @@ function closeBlipInfo() {
   var panel = document.getElementById('blip-info');
   if (getComputedStyle(panel).display === 'none') return;
   panel.style.display = 'none';
-  if (panel._opener && typeof panel._opener.focus === 'function') {
-    panel._opener.focus();
-  }
+  if (panel._opener && typeof panel._opener.focus === 'function') panel._opener.focus();
 }
 document.querySelector('#blip-info .bi-close').addEventListener('click', closeBlipInfo);
-// Escape schließt die Info-Box (Dialog-Konvention)
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeBlipInfo();
-});
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeBlipInfo(); });
 </script>
 
 </body>

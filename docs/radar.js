@@ -126,6 +126,21 @@ function radar_visualization(config) {
     return Math.min(Math.max(value, low), high);
   }
 
+  // pick black or white text so it stays legible on a given fill colour (white on the
+  // bright yellow / salmon rings is unreadable otherwise)
+  function contrastText(color) {
+    var c = String(color || "").replace("#", "");
+    if (c.length === 3) c = c[0] + c[0] + c[1] + c[1] + c[2] + c[2];
+    var r = parseInt(c.substr(0, 2), 16) / 255;
+    var g = parseInt(c.substr(2, 2), 16) / 255;
+    var b = parseInt(c.substr(4, 2), 16) / 255;
+    if (isNaN(r) || isNaN(g) || isNaN(b)) return "#ffffff";
+    var lum = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    // threshold 0.45 keeps dark text on the mid-light ring colours (green/teal as well
+    // as yellow/salmon), all of which fail WCAG AA against white
+    return lum > 0.45 ? "#1a1a1a" : "#ffffff";
+  }
+
   function segment(quadrant, ring) {
     var q = quadrants[quadrant];
     var t_min = q.radial_min;
@@ -262,54 +277,81 @@ function radar_visualization(config) {
   // define default font-family
   config.font_family = config.font_family || "Arial, Helvetica";
 
-  // draw segment divider lines: one spoke from the centre to the outer ring per
-  // segment boundary. Two crossing lines (the original) are just the N=4 case.
   var grid_outer_radius = rings[rings.length - 1].radius;
-  for (var s = 0; s < num_segments; s++) {
-    var grid_angle = segment_angle * s;
-    grid.append("line")
-      .attr("x1", 0).attr("y1", 0)
-      .attr("x2", grid_outer_radius * Math.cos(grid_angle))
-      .attr("y2", grid_outer_radius * Math.sin(grid_angle))
-      .style("stroke", config.colors.grid)
-      .style("stroke-width", 1);
+
+  // segment background fills: a light tinted annular sector per segment, so the areas
+  // read as distinct regions instead of bare wedges between thin lines. Drawn first
+  // (under the rings, spokes, labels and blips).
+  function sectorPath(t0, t1, ri, ro) {
+    var large = (t1 - t0) > Math.PI ? 1 : 0;
+    return "M " + (ri * Math.cos(t0)) + " " + (ri * Math.sin(t0)) +
+      " L " + (ro * Math.cos(t0)) + " " + (ro * Math.sin(t0)) +
+      " A " + ro + " " + ro + " 0 " + large + " 1 " + (ro * Math.cos(t1)) + " " + (ro * Math.sin(t1)) +
+      " L " + (ri * Math.cos(t1)) + " " + (ri * Math.sin(t1)) +
+      " A " + ri + " " + ri + " 0 " + large + " 0 " + (ri * Math.cos(t0)) + " " + (ri * Math.sin(t0)) + " Z";
+  }
+  for (var sf = 0; sf < num_segments; sf++) {
+    var segFill = config.quadrants[sf] && config.quadrants[sf].color;
+    if (segFill) {
+      grid.append("path")
+        .attr("d", sectorPath(segment_angle * sf, segment_angle * (sf + 1), 30, grid_outer_radius))
+        .style("fill", segFill)
+        .style("stroke", "none");
+    }
   }
 
-  // background color. Usage `.attr("filter", "url(#solid)")`
+  // segment divider spokes: white gutters separate the tinted areas cleanly
+  for (var s = 0; s < num_segments; s++) {
+    grid.append("line")
+      .attr("x1", 0).attr("y1", 0)
+      .attr("x2", grid_outer_radius * Math.cos(segment_angle * s))
+      .attr("y2", grid_outer_radius * Math.sin(segment_angle * s))
+      .style("stroke", "#ffffff")
+      .style("stroke-width", 2);
+  }
+
+  // background color filter. Usage `.attr("filter", "url(#solid)")`
   // SOURCE: https://stackoverflow.com/a/31013492/2609980
   var defs = grid.append("defs");
   var filter = defs.append("filter")
-    .attr("x", 0)
-    .attr("y", 0)
-    .attr("width", 1)
-    .attr("height", 1)
-    .attr("id", "solid");
-  filter.append("feFlood")
-    .attr("flood-color", "rgb(0, 0, 0, 0.8)");
-  filter.append("feComposite")
-    .attr("in", "SourceGraphic");
+    .attr("x", 0).attr("y", 0).attr("width", 1).attr("height", 1).attr("id", "solid");
+  filter.append("feFlood").attr("flood-color", "rgb(0, 0, 0, 0.8)");
+  filter.append("feComposite").attr("in", "SourceGraphic");
 
-  // draw rings
+  // ring boundary circles, each stroked in its ring colour so the four rings are
+  // distinguishable at a glance
   for (var i = 0; i < rings.length; i++) {
     grid.append("circle")
-      .attr("cx", 0)
-      .attr("cy", 0)
+      .attr("cx", 0).attr("cy", 0)
       .attr("r", rings[i].radius)
       .style("fill", "none")
-      .style("stroke", config.colors.grid)
-      .style("stroke-width", 1);
-    if (config.print_layout) {
+      .style("stroke", (config.rings[i] && config.rings[i].color) || config.colors.grid)
+      .style("stroke-width", 2)
+      .style("opacity", 0.55);
+  }
+
+  // (ring labels are drawn later, in a layer above the blips, so they stay readable)
+
+  // segment labels around the outer rim, so each area is named on the radar itself
+  if (config.print_layout && config.draw_segment_labels !== false) {
+    for (var sl = 0; sl < num_segments; sl++) {
+      var segObj = config.quadrants[sl] || {};
+      var midA = segment_angle * (sl + 0.5);
+      var lr = grid_outer_radius + 18;
+      var anchor = Math.cos(midA) > 0.3 ? "start" : (Math.cos(midA) < -0.3 ? "end" : "middle");
+      var dyA = Math.sin(midA) > 0.3 ? 15 : (Math.sin(midA) < -0.3 ? -7 : 4);
       grid.append("text")
-        .text(config.rings[i].name)
-        .attr("y", -rings[i].radius + 62)
-        .attr("text-anchor", "middle")
-        .style("fill", config.rings[i].color)
-        .style("opacity", 0.35)
+        .text(segObj.name || "")
+        .attr("x", lr * Math.cos(midA))
+        .attr("y", lr * Math.sin(midA) + dyA)
+        .attr("text-anchor", anchor)
+        .style("fill", segObj.accent || "#333")
         .style("font-family", config.font_family)
-        .style("font-size", "42px")
-        .style("font-weight", "bold")
-        .style("pointer-events", "none")
-        .style("user-select", "none");
+        .style("font-size", "15px").style("font-weight", "bold")
+        .style("paint-order", "stroke")
+        .style("stroke", "#ffffff").style("stroke-width", "4px")
+        .style("stroke-linejoin", "round")
+        .style("pointer-events", "none").style("user-select", "none");
     }
   }
 
@@ -327,8 +369,10 @@ function radar_visualization(config) {
     );
   }
 
-  // draw title and legend (only in print layout)
+  // draw title, footer and legend (only in print layout; each gated so the host page
+  // can move them into HTML around the radar)
   if (config.print_layout) {
+    if (config.draw_title !== false) {
     // title
     radar.append("a")
       .attr("href", config.repo_url)
@@ -348,7 +392,9 @@ function radar_visualization(config) {
       .style("font-family", config.font_family)
       .style("font-size", "14")
       .style("fill", "#999")
+    }
 
+    if (config.draw_footer !== false) {
     // footer
     radar.append("text")
       .attr("transform", translate(config.footer_offset.x, config.footer_offset.y))
@@ -356,7 +402,9 @@ function radar_visualization(config) {
       .attr("xml:space", "preserve")
       .style("font-family", config.font_family)
       .style("font-size", "12px");
+    }
 
+    if (config.draw_legend !== false) {
     // legend
     const legend = radar.append("g");
     for (let quadrant = 0; quadrant < num_segments; quadrant++) {
@@ -409,6 +457,7 @@ function radar_visualization(config) {
               });
       }
     }
+    }
   }
 
   function wrap_text(text) {
@@ -460,6 +509,34 @@ function radar_visualization(config) {
   var rink = radar.append("g")
     .attr("id", "rink");
 
+  // ring labels: compact pills stacked along the top vertical, in ring colour. Drawn in
+  // their own layer above the blips (but below the bubble) so blips never cover them.
+  if (config.print_layout && config.draw_ring_labels !== false) {
+    var ringLabelLayer = radar.append("g").attr("id", "ring-labels");
+    for (var rl = 0; rl < rings.length; rl++) {
+      var inner_r = rl === 0 ? 30 : rings[rl - 1].radius;
+      var band_center = (inner_r + rings[rl].radius) / 2;
+      var ringObj = config.rings[rl] || {};
+      var ringColor = ringObj.labelColor || ringObj.color || "#555";
+      var ringName = ringObj.name || "";
+      var pillW = ringName.length * 8.5 + 18;
+      var rlg = ringLabelLayer.append("g").attr("transform", translate(0, -band_center));
+      rlg.append("rect")
+        .attr("x", -pillW / 2).attr("y", -11).attr("width", pillW).attr("height", 21)
+        .attr("rx", 10).attr("ry", 10)
+        .style("fill", "#ffffff").style("opacity", 0.95)
+        .style("stroke", ringColor).style("stroke-width", 1.2);
+      rlg.append("text")
+        .text(ringName)
+        .attr("text-anchor", "middle").attr("y", 4)
+        .style("fill", ringColor)
+        .style("font-family", config.font_family)
+        .style("font-size", "13px").style("font-weight", "bold")
+        .style("letter-spacing", "0.5px")
+        .style("pointer-events", "none").style("user-select", "none");
+    }
+  }
+
   // rollover bubble (on top of everything else)
   var bubble = radar.append("g")
     .attr("id", "bubble")
@@ -504,16 +581,16 @@ function radar_visualization(config) {
       .style("opacity", 0);
   }
 
+  // Highlight the matching legend entry when a blip is hovered. The legend now lives in
+  // HTML (built by the host page), so toggle a class; guard against a missing element.
   function highlightLegendItem(d) {
     var legendItem = document.getElementById("legendItem" + d.id);
-    legendItem.setAttribute("filter", "url(#solid)");
-    legendItem.setAttribute("fill", "white");
+    if (legendItem) legendItem.classList.add("legend-hl");
   }
 
   function unhighlightLegendItem(d) {
     var legendItem = document.getElementById("legendItem" + d.id);
-    legendItem.removeAttribute("filter");
-    legendItem.removeAttribute("fill");
+    if (legendItem) legendItem.classList.remove("legend-hl");
   }
 
   // Populate the HTML info box (defined in index.html) with the clicked blip.
@@ -536,6 +613,8 @@ function radar_visualization(config) {
     var closeBtn = panel.querySelector(".bi-close");
     if (closeBtn) closeBtn.focus();
   }
+  // expose so the HTML segment legend can open the same info box on click
+  if (typeof window !== "undefined") window.radarShowInfo = showInfo;
 
   // draw blips on radar
   var blips = rink.selectAll(".blip")
@@ -543,6 +622,7 @@ function radar_visualization(config) {
     .enter()
       .append("g")
         .attr("class", "blip")
+        .attr("id", function(d) { return "blip" + d.id; })
         .attr("transform", function(d, i) { return legend_transform(d.quadrant, d.ring, config.legend_column_width, i); })
         .style("cursor", "pointer")
         .on("mouseover", function(event, d) { showBubble(d); highlightLegendItem(d); })
@@ -563,7 +643,8 @@ function radar_visualization(config) {
       }
     }
 
-    // blip shape
+    // blip shape (the thin white outline that keeps blips legible over the tinted
+    // segments, and the hover highlight, live in radar.css via the .blip selector)
     if (d.moved == 1) {
       blip.append("path")
         .attr("d", "M -11,5 11,5 0,-13 z") // triangle pointing up
@@ -589,7 +670,7 @@ function radar_visualization(config) {
         .text(blip_text)
         .attr("y", 3)
         .attr("text-anchor", "middle")
-        .style("fill", "#fff")
+        .style("fill", contrastText(d.color))
         .style("font-family", config.font_family)
         .style("font-size", function(d) { return blip_text.length > 2 ? "8px" : "9px"; })
         .style("pointer-events", "none")
@@ -608,7 +689,7 @@ function radar_visualization(config) {
   d3.forceSimulation()
     .nodes(config.entries)
     .velocityDecay(0.19) // magic number (found by experimentation)
-    .force("collision", d3.forceCollide().radius(12).strength(0.85))
+    .force("collision", d3.forceCollide().radius(13).strength(0.85))
     .on("tick", ticked);
 
   function ringDescriptionsTable() {
